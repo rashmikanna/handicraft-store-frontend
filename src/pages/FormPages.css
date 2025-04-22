@@ -1,0 +1,12 @@
+body {
+    background: linear-gradient(to right, #fff9f0, #fff1e6);
+  }
+  
+  .form-card {
+    width: 400px;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    background-color: #fffdfa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
