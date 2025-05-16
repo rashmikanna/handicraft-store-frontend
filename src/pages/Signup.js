@@ -1,79 +1,73 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
-import './FormPages.css';
+import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 
-function Signup() {
+export default function Signup() {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);  // New state for loading indicator
+  const [role, setRole]         = useState('consumer');
+  const [msg, setMsg]           = useState('');
+  const [err, setErr]           = useState(false);
+  const [loading, setLoading]   = useState(false);
+
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setLoading(true);  // Show loading indicator
-
-    // Simple validation
-    if (!email.includes('@')) {
-      setMessage('Please enter a valid email address.');
-      setError(true);
-      setLoading(false);
-      return;
-    }
-    if (password.length < 6) {
-      setMessage('Password must be at least 6 characters.');
-      setError(true);
-      setLoading(false);
-      return;
-    }
-
+    setLoading(true);
+    setErr(false);
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/signup/', {
+      const res = await axios.post('http://127.0.0.1:8000/api/signup/', {
         username,
         email,
         password,
+        role,
       });
 
-      setMessage('Signup successful! You can now login.');
-      setError(false);
-      setTimeout(() => navigate('/login'), 2000);  // Redirect to login after 2 seconds
+      // ✅ Save tokens and info in localStorage
+      localStorage.setItem('access', res.data.access);
+      localStorage.setItem('refresh', res.data.refresh);
+      localStorage.setItem('username', res.data.username);
+      localStorage.setItem('role', role);
+
+      setMsg('Signup successful!');
+
+      setTimeout(() => {
+        // ✅ Redirect based on role
+        if (role === 'producer') navigate('/producer/dashboard');
+        else navigate('/');
+      }, 1000);
     } catch (error) {
-      const errorMsg = error.response ? error.response.data.detail : 'Signup failed. Please try again.';
-      setMessage(errorMsg);
-      setError(true);
+      setErr(true);
+      setMsg(error.response?.data?.detail || 'Signup failed.');
     } finally {
-      setLoading(false);  // Hide loading indicator
+      setLoading(false);
     }
   };
 
   return (
     <Container className="mt-5 d-flex justify-content-center">
       <Card className="p-4 form-card">
-        <h2 className="mb-4 text-center text-success">Sign Up</h2>
+        <h2 className="mb-4 text-center">Sign Up</h2>
         <Form onSubmit={handleSignup}>
           <Form.Group controlId="username">
-            <Form.Label>Full Name</Form.Label>
+            <Form.Label>Username</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Enter full name"
               required
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
             />
           </Form.Group>
 
           <Form.Group controlId="email" className="mt-3">
-            <Form.Label>Email address</Form.Label>
+            <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
-              placeholder="Enter email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
             />
           </Form.Group>
 
@@ -81,27 +75,39 @@ function Signup() {
             <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Password"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
             />
           </Form.Group>
 
-          <Button variant="success" type="submit" className="mt-4 w-100" disabled={loading}>
+          <Form.Group controlId="role" className="mt-3">
+            <Form.Label>Role</Form.Label>
+            <Form.Select
+              value={role}
+              onChange={e => setRole(e.target.value)}
+            >
+              <option value="consumer">Consumer</option>
+              <option value="producer">Producer</option>
+            </Form.Select>
+          </Form.Group>
+
+          <Button
+            variant="primary"
+            type="submit"
+            className="mt-4 w-100"
+            disabled={loading}
+          >
             {loading ? <Spinner animation="border" size="sm" /> : 'Sign Up'}
           </Button>
         </Form>
 
-        {/* Display success or error messages */}
-        {message && (
-          <Alert variant={error ? 'danger' : 'success'} className="mt-3">
-            {message}
+        {msg && (
+          <Alert variant={err ? 'danger' : 'success'} className="mt-3">
+            {msg}
           </Alert>
         )}
       </Card>
     </Container>
   );
 }
-
-export default Signup;
