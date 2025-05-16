@@ -5,7 +5,7 @@ import axios from 'axios';
 import './FormPages.css';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ function Login() {
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/token/', {
-        email,
+        username,  // 👈 match what Django expects
         password,
       });
 
@@ -39,14 +39,14 @@ function Login() {
       <Card className="p-4 form-card">
         <h2 className="mb-4 text-center text-primary">Login</h2>
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="email">
-            <Form.Label>Email address</Form.Label>
+          <Form.Group controlId="username">
+            <Form.Label>Username</Form.Label>
             <Form.Control
-              type="email"
-              placeholder="Enter email"
+              type="text"
+              placeholder="Enter username"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </Form.Group>
 
