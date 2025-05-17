@@ -9,7 +9,7 @@ function ProductListing() {
     const [error, setError] = useState(null); // Handle errors
 
     useEffect(() => {
-        axios.get('http://localhost:8000/products/products/') // Fetch products from backend
+        axios.get('http://localhost:8000/api/products/products/') // Fetch products from backend
             .then(res => {
                 console.log('Full API Response:', res.data); // Debug the full API response
                 if (Array.isArray(res.data)) {
