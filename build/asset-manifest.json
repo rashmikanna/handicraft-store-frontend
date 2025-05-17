@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/rashmikanna/handicraft-store-fronten/static/css/main.9a487ed8.css",
+    "main.js": "/rashmikanna/handicraft-store-fronten/static/js/main.767bbc83.js",
+    "index.html": "/rashmikanna/handicraft-store-fronten/index.html",
+    "main.9a487ed8.css.map": "/rashmikanna/handicraft-store-fronten/static/css/main.9a487ed8.css.map",
+    "main.767bbc83.js.map": "/rashmikanna/handicraft-store-fronten/static/js/main.767bbc83.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9a487ed8.css",
+    "static/js/main.767bbc83.js"
+  ]
+}

@@ -4,9 +4,9 @@ import './HomePage.css';
 
 function HomePage() {
   const images = [
-    '/images/img1.jpg',
-    '/images/img2.jpg',
-    '/images/img3.jpg',
+      'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163427/d3krqj2iszg8t61achtr.jpg',
+      'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163501/neyt2jkzclce2bly72gs.jpg',
+      'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163637/jycyoedz2qjeszuzaqfy.jpg',
   ];
 
   return (
