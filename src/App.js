@@ -10,8 +10,13 @@ import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import NavbarComponent from './components/NavbarComponent';
+
+// Seller pages
+import SellerSignup from './pages/seller/SellerSignup';
 import SellerProductList from './pages/seller/SellerProductList';
 import SellerProductForm from './pages/seller/SellerProductForm';
+// (Optionally) a status page after signup
+import SellerStatus from './pages/seller/SellerStatus';
 
 function App() {
     return (
@@ -30,7 +35,15 @@ function App() {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/login" element={<Login />} />
+
+                    {/* Buyer signup */}
                     <Route path="/signup" element={<Signup />} />
+
+                    {/* Seller signup */}
+                    <Route path="/signup/seller" element={<SellerSignup />} />
+
+                    {/* (Optional) Post‑signup status page */}
+                    <Route path="/seller-panel/status" element={<SellerStatus />} />
 
                     {/* Seller Panel routes */}
                     <Route path="/seller" element={<SellerProductList />} />
