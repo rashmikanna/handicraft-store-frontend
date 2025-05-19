@@ -92,7 +92,27 @@ function App() {
             </main>
             </div>
         </>
-    );
+    );}
+import SignUp from './pages/Signup';
+
+function App() {
+  return (
+    <>
+      <NavbarComponent />
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/products" element={<ProductListing />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
+    </>
+  );
 }
 
 export default App;
