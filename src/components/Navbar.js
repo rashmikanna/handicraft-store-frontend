@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Navbar, Form, FormControl, Button, Container } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Navbar, Form, FormControl, Button, Container, Nav } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { FaBars, FaHeart, FaShoppingCart, FaUser, FaBell, FaHome } from 'react-icons/fa';
@@ -38,12 +38,18 @@ const sidebarItems = [
   }
 ];
 
-function NavigationBar() {
+function NavbarComponent() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAccountOptions, setShowAccountOptions] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('access');
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleSearchChange = (e) => {
     const input = e.target.value;
@@ -60,6 +66,13 @@ function NavigationBar() {
 
   const handleSearchClick = () => {
     console.log('Searching for:', searchTerm);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    setIsLoggedIn(false);
+    navigate('/login');
   };
 
   return (
@@ -112,8 +125,14 @@ function NavigationBar() {
               {showAccountOptions && (
                 <div className="account-options">
                   <ul>
-                    <li onClick={() => navigate('/login')}>Login</li>
-                    <li onClick={() => navigate('/signup')}>Sign Up</li>
+                    {isLoggedIn ? (
+                      <li onClick={handleLogout}>Logout</li>
+                    ) : (
+                      <>
+                        <li onClick={() => navigate('/login')}>Login</li>
+                        <li onClick={() => navigate('/signup')}>Sign Up</li>
+                      </>
+                    )}
                   </ul>
                 </div>
               )}
@@ -145,4 +164,4 @@ function NavigationBar() {
   );
 }
 
-export default NavigationBar;
+export default NavbarComponent;
