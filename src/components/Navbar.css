@@ -1,0 +1,203 @@
+.hamburger-icon {
+    cursor: pointer;
+    margin-right: 10px;
+    color: #333;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100%;
+    width: 280px;
+    background-color: #fff;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+    z-index: 1050;
+    padding: 20px;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+  
+  .sidebar-header {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .sidebar .close-btn {
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .sidebar-section {
+    margin-top: 20px;
+  }
+  
+  .sidebar-section h5 {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #222;
+  }
+  
+  .sidebar-section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .sidebar-section ul li {
+    padding: 6px 0;
+    cursor: pointer;
+    color: #555;
+    transition: 0.2s;
+  }
+  
+  .sidebar-section ul li:hover {
+    color: #f57c00;
+    transform: translateX(4px);
+  }
+
+  .custom-search-form {
+    transform: translateX(-60px); /* Try -10px, adjust as needed */
+  }
+  
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 1040;
+  }
+
+ /* For better visual interaction */
+.navbar .nav-item svg {
+    transition: transform 0.3s ease, color 0.3s ease; /* Smooth transitions for scale and color */
+    color: #555; /* Default icon color */
+    width: 24px; /* Adjust icon size */
+    height: 24px;
+    cursor: pointer; /* Makes the cursor indicate interactivity */
+  }
+  
+  /* Wiggle effect using keyframes */
+  @keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+    75% { transform: rotate(3deg); }
+    100% { transform: rotate(0deg); }
+  }
+  
+  /* Apply wiggle effect on hover for all icons */
+  .navbar .nav-item:hover svg {
+    animation: wiggle 0.6s ease; /* Apply the wiggle animation */
+    color: #ff9900; /* Color change on hover */
+    transform: scale(1.1); /* Slightly scale the icon */
+  }
+  
+  /* Hover effect for all icons */
+  .navbar .nav-item:hover svg {
+    color: #ff9900; /* Add a hover color to make them pop */
+  }
+  
+  /* Styling for individual navbar items (to align them properly) */
+  .navbar .navbar-icons {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar .nav-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    cursor: pointer; /* Makes the cursor indicate interactivity */
+  }
+  
+  /* Styling for the account options dropdown */
+  .account-options {
+    position: absolute;
+    top: 30px;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 100px;
+    z-index: 10;
+  }
+  
+  .account-options ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .account-options li {
+    padding: 5px;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .account-options li:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Navbar collapse animation */
+  .navbar .navbar-collapse {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .navbar .navbar-toggle {
+    border: none;
+    background-color: transparent;
+    font-size: 28px;
+    color: #555;
+  }
+  
+  .navbar .navbar-toggle:focus {
+    outline: none;
+  }
+  
+  /* Optional: Custom styling for the navbar brand */
+  .navbar .navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .dropdown-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    list-style: none;
+    margin: 5px 0 0 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .dropdown-suggestions li {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
+  .dropdown-suggestions li:hover {
+    background-color: #f5f5f5;
+  }
+  
+  
+  
+  
+  
+
+
+  
+  
