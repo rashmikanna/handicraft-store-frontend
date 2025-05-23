@@ -1,10 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
+<<<<<<< HEAD
 import { BrowserRouter } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 
+=======
+import './index.css';
+>>>>>>> 9d9b3da (Changes made to Homepage)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

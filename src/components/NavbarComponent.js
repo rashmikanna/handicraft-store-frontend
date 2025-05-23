@@ -66,6 +66,7 @@ export default function NavbarComponent() {
         }
     }, []);
 
+<<<<<<< HEAD
     // Toggle search suggestions
     const handleSearchChange = e => {
         const q = e.target.value;
@@ -88,6 +89,35 @@ export default function NavbarComponent() {
         setSellerMode(false);
         navigate('/login');
     };
+=======
+  return (
+    <>
+      <Navbar bg="light" expand="lg" className="shadow-sm py-3 px-4 sticky-top flex-column">
+        <Container fluid className="align-items-center justify-content-between d-flex w-100">
+          <div className="hamburger-icon" onClick={() => setSidebarOpen(true)}>
+            <FaBars size={22} />
+          </div>
+
+          <Navbar.Brand onClick={() => navigate('/')} className="kalamart-logo" style={{ cursor: 'pointer' }}>
+  Kala<span className="highlight-part">Mart</span>
+</Navbar.Brand>
+
+
+
+          <div className="search-container">
+            <Form className="d-flex align-items-center position-relative custom-search-form">
+              <FormControl
+                type="search"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                placeholder="Search for products..."
+                className="me-2 search-bar-input extended-search-bar"
+                aria-label="Search"
+              />
+              <Button variant="warning" onClick={handleSearchClick}>
+                Search
+              </Button>
+>>>>>>> 9d9b3da (Changes made to Homepage)
 
     const totalQuantity = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
@@ -191,6 +221,25 @@ export default function NavbarComponent() {
                             </div>
                         </>
                     )}
+<<<<<<< HEAD
+=======
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </Container>
+
+        {/* Subcategories Bar */}
+        <div className="subcategories-bar w-100">
+          <div>Silver Crafts</div>
+          <div>Handlooms</div>
+          <div>Metal Crafts</div>
+          <div>Textiles and Embroidery</div>
+          <div>Home Decor</div>
+        </div>
+      </Navbar>
+>>>>>>> 9d9b3da (Changes made to Homepage)
 
                     {/* CTA Buttons */}
                     <Nav className="align-items-center">
