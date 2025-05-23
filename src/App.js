@@ -14,9 +14,14 @@ import SignUp from './pages/Signup';
 function App() {
   return (
     <>
+    <div className="main-wrapper">
       <NavbarComponent />
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />} />
+        {/* Default route */}
+        <Route index element={<HomePage />} />
+
+        {/* Explicit routes */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/products" element={<ProductListing />} />
         <Route path="/products/:id" element={<ProductDetails />} />
@@ -26,7 +31,11 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+
+        {/* Catch-all fallback to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    </div>
     </>
   );
 }

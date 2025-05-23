@@ -77,24 +77,26 @@ function NavbarComponent() {
 
   return (
     <>
-      <Navbar bg="light" expand="lg" className="shadow-sm py-3 px-4 sticky-top">
-        <Container fluid className="align-items-center justify-content-between d-flex">
+      <Navbar bg="light" expand="lg" className="shadow-sm py-3 px-4 sticky-top flex-column">
+        <Container fluid className="align-items-center justify-content-between d-flex w-100">
           <div className="hamburger-icon" onClick={() => setSidebarOpen(true)}>
             <FaBars size={22} />
           </div>
 
-          <Navbar.Brand href="/" className="fw-bold text-dark me-4 ms-2">
-            KalaMart
-          </Navbar.Brand>
+          <Navbar.Brand onClick={() => navigate('/')} className="kalamart-logo" style={{ cursor: 'pointer' }}>
+  Kala<span className="highlight-part">Mart</span>
+</Navbar.Brand>
 
-          <div className="mx-auto" style={{ marginLeft: '-20px', position: 'relative' }}>
+
+
+          <div className="search-container">
             <Form className="d-flex align-items-center position-relative custom-search-form">
               <FormControl
                 type="search"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Search for products..."
-                className="me-2 search-bar-input"
+                className="me-2 search-bar-input extended-search-bar"
                 aria-label="Search"
               />
               <Button variant="warning" onClick={handleSearchClick}>
@@ -139,6 +141,15 @@ function NavbarComponent() {
             </div>
           </div>
         </Container>
+
+        {/* Subcategories Bar */}
+        <div className="subcategories-bar w-100">
+          <div>Silver Crafts</div>
+          <div>Handlooms</div>
+          <div>Metal Crafts</div>
+          <div>Textiles and Embroidery</div>
+          <div>Home Decor</div>
+        </div>
       </Navbar>
 
       {/* Sidebar */}

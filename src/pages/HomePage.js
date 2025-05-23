@@ -11,16 +11,16 @@ function HomePage() {
 
   return (
     <Container className="text-center mt-5">
-      <h1 className="fw-bold">
-        Welcome to <span style={{ color: '#d97706' }}>Telangana Handlooms</span> &{' '}
-        <span style={{ color: '#1e3a8a' }}>Handicrafts</span>
-      </h1>
+      <h1 className="fw-bold website-title">
+  <span className="gradient-text">Welcome to&nbsp;</span>
+  <span className="gradient-text">KalaMart</span>
+    <span className="logo-dot">.</span>
+</h1>
       <p className="lead">
-        Discover the rich heritage and craftsmanship of Telangana. Shop unique, traditional, and
-        handmade products directly from local artisans.
+        Discover the rich heritage and craftsmanship of Telangana. Shop unique, traditional, and handmade products directly from local artisans.
       </p>
 
-      <Carousel fade controls={false} indicators={false} interval={3000} className="carousel-wrapper">
+      <Carousel fade controls={false} indicators={false} interval={3000} className="carousel-wrapper large-carousel">
         {images.map((img, index) => (
           <Carousel.Item key={index}>
             <img className="d-block mx-auto slider-img" src={img} alt={`Slide ${index}`} />
