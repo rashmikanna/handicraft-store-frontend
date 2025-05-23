@@ -1,4 +1,4 @@
-.hamburger-icon {
+﻿.hamburger-icon {
     cursor: pointer;
     margin-right: 10px;
     color: #333;
@@ -192,12 +192,13 @@
   .dropdown-suggestions li:hover {
     background-color: #f5f5f5;
   }
-  
-  
-  
-  
-  
 
-
-  
-  
+.start-selling-btn {
+    background: transparent;
+    border: none;
+    color: var(--cta-color);
+    font-size: 0.99rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+}

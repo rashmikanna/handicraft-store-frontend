@@ -1,0 +1,28 @@
+
+.long-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Optional: style the card for better appearance */
+.form-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Align the form heading */
+.form-card h2 {
+  font-size: 1.75rem;
+  text-transform: none;
+}
+
+/* Style the submit button */
+.form-card .btn-primary {
+  background-color: #D18F8F;
+  border-color: #D18F8F;
+}
+.form-card .btn-primary:hover {
+  background-color: #C47F7F;
+  border-color: #C47F7F;
+}

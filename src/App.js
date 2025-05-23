@@ -1,5 +1,7 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import NavbarComponent from './components/NavbarComponent';
+
 import HomePage from './pages/HomePage';
 import ProductListing from './pages/ProductListing';
 import ProductDetails from './pages/ProductDetails';
@@ -9,48 +11,50 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import NavbarComponent from './components/NavbarComponent';
 
 // Seller pages
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerProductList from './pages/seller/SellerProductList';
 import SellerProductForm from './pages/seller/SellerProductForm';
-// (Optionally) a status page after signup
 import SellerStatus from './pages/seller/SellerStatus';
 
 function App() {
     return (
         <>
-            {/* Navbar remains global */}
             <NavbarComponent />
 
             <main className="p-4">
                 <Routes>
-                    {/* Public routes */}
+                    {/* Home */}
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/home" element={<HomePage />} />
+
+                    {/* Products */}
                     <Route path="/products" element={<ProductListing />} />
                     <Route path="/products/:id" element={<ProductDetails />} />
+
+                    {/* Cart & Checkout */}
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<Checkout />} />
+
+                    {/* Static */}
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/login" element={<Login />} />
 
-                    {/* Buyer signup */}
+                    {/* Auth */}
+                    <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
 
                     {/* Seller signup */}
                     <Route path="/signup/seller" element={<SellerSignup />} />
-
-                    {/* (Optional) Post‑signup status page */}
                     <Route path="/seller-panel/status" element={<SellerStatus />} />
 
-                    {/* Seller Panel routes */}
+                    {/* Seller panel */}
                     <Route path="/seller" element={<SellerProductList />} />
                     <Route path="/seller/new" element={<SellerProductForm />} />
                     <Route path="/seller/:id/edit" element={<SellerProductForm />} />
 
-                    {/* Optional 404 fallback */}
+                    {/* Optional fallback */}
                     {/* <Route path="*" element={<NotFound />} /> */}
                 </Routes>
             </main>
@@ -58,4 +62,4 @@ function App() {
     );
 }
 
-export default App;
+export default App;                
