@@ -104,12 +104,12 @@ function NavbarComponent() {
     return (
         <>
             <Navbar bg="light" expand="lg" className="shadow-sm py-3 px-4 sticky-top">
-                <Container fluid className="d-flex align-items-center justify-content-between">
+                <Container fluid className="align-items-center justify-content-between d-flex w-100">
                     <div className="hamburger-icon" onClick={() => setSidebarOpen(true)}>
                         <FaBars size={22} />
                     </div>
-                    <Navbar.Brand href="/" className="fw-bold text-dark ms-2">
-                        KalaMart
+                    <Navbar.Brand onClick={() => navigate('/')} className="kalamart-logo" style={{ cursor: 'pointer' }}>
+                    Kala<span className="highlight-part">Mart</span>
                     </Navbar.Brand>
 
                     <Form

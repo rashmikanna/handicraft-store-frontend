@@ -159,16 +159,42 @@ export default function ProductListing() {
             </Offcanvas>
 
             {/* Products Grid */}
-            <Row>
+            <Row className="g-4">
                 {products.length > 0 ? (
                     products.map(p => (
-                        <Col md={4} key={p.id} className="mb-4">
-                            <Card>
-                                <Card.Img variant="top" src={p.images?.[0] || '/default-placeholder-image.jpg'} />
-                                <Card.Body>
-                                    <Card.Title>{p.name}</Card.Title>
-                                    <Card.Text>₹{p.price}</Card.Text>
-                                    <Link to={`/products/${p.id}`}><Button size="md" variant="primary">View Details</Button></Link>
+                        <Col md={4} key={p.id}>
+                            <Card
+                                style={{ 
+                                    height: '100%', 
+                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)', 
+                                    borderRadius: '12px', 
+                                    transition: 'transform 0.2s' 
+                                }}
+                                className="h-100"
+                                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+                                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <div style={{ overflow: 'hidden', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', height: '220px' }}>
+                                    <Card.Img 
+                                        variant="top" 
+                                        src={p.images?.[0] || '/default-placeholder-image.jpg'} 
+                                        style={{ 
+                                            height: '220px', 
+                                            width: '100%', 
+                                            objectFit: 'cover',
+                                            borderTopLeftRadius: '12px',
+                                            borderTopRightRadius: '12px'
+                                        }} 
+                                    />
+                                </div>
+                                <Card.Body className="d-flex flex-column justify-content-between">
+                                    <div>
+                                        <Card.Title style={{ fontWeight: '600', fontSize: '1.25rem', minHeight: '3em' }}>{p.name}</Card.Title>
+                                        <Card.Text style={{ fontWeight: '700', fontSize: '1.15rem', color: '#E65100' }}>₹{p.price}</Card.Text>
+                                    </div>
+                                    <Link to={`/products/${p.id}`}>
+                                        <Button size="md" variant="primary" className="mt-3 w-100">View Details</Button>
+                                    </Link>
                                 </Card.Body>
                             </Card>
                         </Col>
