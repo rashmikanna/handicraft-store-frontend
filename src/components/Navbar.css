@@ -78,8 +78,8 @@
 .navbar .nav-item svg {
     transition: transform 0.3s ease, color 0.3s ease; /* Smooth transitions for scale and color */
     color: #555; /* Default icon color */
-    width: 24px; /* Adjust icon size */
-    height: 24px;
+    width: 60px; /* Adjust icon size */
+    height: 60px;
     cursor: pointer; /* Makes the cursor indicate interactivity */
   }
   
@@ -259,4 +259,34 @@
 }
 
 
+/* Make all navbar icons larger */
+.navbar-icons svg,
+.navbar .nav-item svg {
+    font-size: 1.3rem !important;
+}
 
+/* Ensure the icon container is a flex row */
+.navbar-icons {
+    display: flex !important;
+    align-items: center !important;
+}
+
+    /* Give each SVG its own side‐margin and dark grey color */
+    .navbar-icons svg {
+        margin: 0 0.6rem !important; /* 1rem on left & right */
+        color: #333 !important; /* dark gray */
+        fill: #333 !important; /* in case icon paths need it */
+        transition: color 0.2s ease, transform 0.2s ease !important;
+    }
+
+        /* Hover feedback — slightly lighter gray + scale */
+        .navbar-icons svg:hover {
+            color: #555 !important;
+            fill: #555 !important;
+            transform: scale(1.1) !important;
+        }
+
+
+.navbar-icons {
+    margin-right: 2rem !important; /* adjust 2rem to taste */
+}

@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import './SellerSignup.css';
 
 export default function SellerSignup() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const next = location.state?.next || '/';
-
     const [formData, setFormData] = useState({
         shop_name: '',
         craft_category: '',
@@ -18,7 +15,7 @@ export default function SellerSignup() {
         govt_id_number: '',
         bank_account_no: '',
         bank_ifsc: '',
-        id_document: null
+        id_document: null,
     });
     const [msg, setMsg] = useState('');
     const [err, setErr] = useState(false);
@@ -39,18 +36,13 @@ export default function SellerSignup() {
         setErr(false);
 
         const token = localStorage.getItem('access');
-        console.log("TOKEN BEING SENT:", token);
         if (!token) {
-            return navigate('/login', { state: { next: '/signup/seller' } });
+            return navigate('/login', { state: { next: '/seller/status' } });
         }
 
         const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            if (key === 'id_document') {
-                if (formData.id_document) data.append('id_document', formData.id_document);
-            } else {
-                data.append(key, formData[key]);
-            }
+        Object.entries(formData).forEach(([key, val]) => {
+            if (val != null) data.append(key, val);
         });
 
         try {
@@ -60,22 +52,21 @@ export default function SellerSignup() {
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                        Authorization: `Bearer ${token}`
-                    }
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
-            setMsg('Application submitted, pending approval.');
-            setTimeout(() => navigate(next), 1000);
+            // after successful POST…
+              setMsg('Application submitted, pending approval.');
+              setTimeout(() => navigate('/seller-panel/status'), 1000);
         } catch (error) {
             setErr(true);
-            const detail = error.response?.data?.detail;
-            const serverError = error.response?.data?.error;
-            setMsg(detail || serverError || 'Submission failed.');
+            const detail = error.response?.data?.detail || 'Submission failed.';
+            setMsg(detail);
         } finally {
             setLoading(false);
         }
     };
-
 
     return (
         <Container className="mt-5 d-flex justify-content-center">
@@ -90,7 +81,7 @@ export default function SellerSignup() {
                         { label: 'Govt ID Type', name: 'govt_id_type' },
                         { label: 'Govt ID Number', name: 'govt_id_number' },
                         { label: 'Bank account no', name: 'bank_account_no' },
-                        { label: 'Bank IFSC', name: 'bank_ifsc' }
+                        { label: 'Bank IFSC', name: 'bank_ifsc' },
                     ].map(field => (
                         <Form.Group controlId={field.name} className="mb-3" key={field.name}>
                             <Form.Label>{field.label}</Form.Label>
@@ -120,8 +111,9 @@ export default function SellerSignup() {
                         {loading ? <Spinner animation="border" size="sm" /> : 'Submit Application'}
                     </Button>
                 </Form>
+
                 {msg && (
-                    <Alert variant={err ? 'danger' : 'success'} className="mt-3">
+                    <Alert variant={err ? 'danger' : 'success'} className="mt-3 text-center">
                         {msg}
                     </Alert>
                 )}

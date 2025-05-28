@@ -44,7 +44,17 @@ function Login() {
   return (
     <Container className="mt-5 d-flex justify-content-center">
       <Card className="p-4 form-card">
-        <h2 className="mb-4 text-center text-primary">Login</h2>
+       <h2 
+            className="mb-4 text-center text-primary" 
+            style={{ 
+                fontFamily: "'Rajdhani', monospace ", 
+                fontWeight: 700,
+                fontSize: '2rem',
+                color: '#D2691E',
+            }}
+        >
+                Login
+        </h2>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="username">
             <Form.Label>Username</Form.Label>

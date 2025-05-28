@@ -1,175 +1,266 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Card, Form, Button, Row, Col, Spinner, Alert } from 'react-bootstrap';
+
+const API_BASE = 'http://127.0.0.1:8000/api';
+
+// Preset specification fields per craft tag
+const presetSpecs = {
+    'Karimnagar Silver Filigrees': ['material', 'technique', 'design', 'dimensions', 'weight', 'care', 'origin'],
+    'Dokra Metal Crafts': ['material', 'technique', 'design', 'dimensions', 'weight', 'finish', 'care', 'origin'],
+    // Add more mappings as needed...
+};
 
 export default function SellerProductForm() {
     const { id } = useParams();
     const isEdit = Boolean(id);
     const navigate = useNavigate();
+
     const [categories, setCategories] = useState([]);
+    const [crafts, setCrafts] = useState([]);
     const [form, setForm] = useState({
         name: '',
         description: '',
         price: '',
         stock: '',
         category: '',
+        craft: '',
         available: true,
-        images: []
+        images: [],
+        specifications: [],
     });
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Load categories and product data
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/products/categories/')
+        fetch(`${API_BASE}/products/categories/`)
             .then(res => res.json())
-            .then(data => setCategories(data))
-            .catch(console.error);
+            .then(setCategories)
+            .catch(() => setError('Failed to load categories'));
+
+        fetch(`${API_BASE}/products/products/tags/`)
+            .then(res => res.json())
+            .then(setCrafts)
+            .catch(() => setError('Failed to load craft tags'));
 
         if (isEdit) {
-            fetch(`http://127.0.0.1:8000/products/seller/products/${id}/`)
+            setLoading(true);
+            fetch(`${API_BASE}/products/products/${id}/`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` }
+            })
                 .then(res => res.json())
-                .then(data => setForm({ ...form, ...data }))
-                .catch(setError);
+                .then(data => {
+                    const specsArray = Object.entries(data.specifications).map(([key, value]) => ({ key, value }));
+                    setForm({
+                        name: data.name,
+                        description: data.description,
+                        price: data.price,
+                        stock: data.stock,
+                        category: data.category,
+                        craft: data.tags[0] || '',
+                        available: data.available,
+                        images: data.images,
+                        specifications: specsArray,
+                    });
+                })
+                .catch(() => setError('Failed to load product'))
+                .finally(() => setLoading(false));
         }
     }, [id, isEdit]);
 
-    function handleChange(e) {
+    useEffect(() => {
+        if (!isEdit && form.craft && presetSpecs[form.craft]) {
+            setForm(f => ({
+                ...f,
+                specifications: presetSpecs[form.craft].map(key => ({ key, value: '' }))
+            }));
+        }
+    }, [form.craft, isEdit]);
+
+    const handleChange = e => {
         const { name, value, type, checked } = e.target;
         setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-    }
+    };
 
-    function handleImageUpload(e) {
+    const handleImageUpload = e => {
         const file = e.target.files[0];
         if (!file) return;
         const fd = new FormData();
         fd.append('image', file);
-        fetch('http://127.0.0.1:8000/products/upload-image/', {
-            method: 'POST',
-            body: fd
-        })
+        fetch(`${API_BASE}/products/upload-image/`, { method: 'POST', body: fd })
             .then(res => res.json())
             .then(data => setForm(prev => ({ ...prev, images: [...prev.images, data.image_url] })))
-            .catch(err => console.error('Upload error', err));
-    }
+            .catch(() => setError('Image upload failed'));
+    };
 
-    function handleSubmit(e) {
+    const handleSpecChange = (idx, field, value) => {
+        const newSpecs = [...form.specifications];
+        newSpecs[idx][field] = value;
+        setForm(prev => ({ ...prev, specifications: newSpecs }));
+    };
+
+    const addSpecRow = () => {
+        setForm(f => ({ ...f, specifications: [...f.specifications, { key: '', value: '' }] }));
+    };
+
+    const removeSpecRow = idx => {
+        setForm(f => ({ ...f, specifications: f.specifications.filter((_, i) => i !== idx) }));
+    };
+
+    const handleSubmit = e => {
         e.preventDefault();
-        const url = isEdit
-            ? `http://127.0.0.1:8000/products/seller/products/${id}/`
-            : 'http://127.0.0.1:8000/products/seller/products/';
-        const method = isEdit ? 'PUT' : 'POST';
+        setLoading(true);
+        setError(null);
 
-        fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form)
+        const specsObj = form.specifications.reduce((obj, { key, value }) => {
+            if (key && value) obj[key] = value;
+            return obj;
+        }, {});
+
+        const payload = {
+            name: form.name,
+            description: form.description,
+            price: parseFloat(form.price),
+            stock: parseInt(form.stock, 10),
+            category: form.category,
+            tags: [form.craft],
+            images: form.images,
+            available: form.available,
+            specifications: specsObj,
+        };
+
+        const endpoint = isEdit
+            ? `${API_BASE}/products/products/${id}/`
+            : `${API_BASE}/products/products/`;
+
+        fetch(endpoint, {
+            method: isEdit ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access')}`
+            },
+            body: JSON.stringify(payload)
         })
-            .then(res => { if (!res.ok) throw new Error(res.statusText); return res.json(); })
+            .then(res => { if (!res.ok) throw new Error(`Server responded ${res.status}`); return res.json(); })
             .then(() => navigate('/seller'))
-            .catch(err => setError(err));
-    }
+            .catch(err => setError(`Save failed: ${err.message}`))
+            .finally(() => setLoading(false));
+    };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto p-6 space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-800">
-                {isEdit ? 'Edit Product' : 'Add Product'}
-            </h2>
-            {error && <p className="text-red-600">Error: {error.message}</p>}
+        <Container className="mt-5">
+            <Card className="mx-auto p-4" style={{ maxWidth: '600px' }}>
+                <h2 className="mb-4 text-center">{isEdit ? 'Edit Product' : 'Add Product'}</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group as={Row} className="mb-3" controlId="name">
+                        <Form.Label column sm={3}>Name</Form.Label>
+                        <Col sm={9}>
+                            <Form.Control name="name" value={form.name} onChange={handleChange} required />
+                        </Col>
+                    </Form.Group>
 
-            <div>
-                <label className="block text-gray-700 mb-1">Name</label>
-                <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
+                    <Form.Group as={Row} className="mb-3" controlId="description">
+                        <Form.Label column sm={3}>Description</Form.Label>
+                        <Col sm={9}>
+                            <Form.Control as="textarea" name="description" value={form.description} onChange={handleChange} rows={3} />
+                        </Col>
+                    </Form.Group>
 
-            <div>
-                <label className="block text-gray-700 mb-1">Description</label>
-                <textarea
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    rows={1}
-                    className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
+                    <Form.Group as={Row} className="mb-3" controlId="price">
+                        <Form.Label column sm={3}>Price</Form.Label>
+                        <Col sm={9}>
+                            <Form.Control type="number" step="0.01" name="price" value={form.price} onChange={handleChange} required />
+                        </Col>
+                    </Form.Group>
 
-            <div>
-                <label className="block text-gray-700 mb-1">Price</label>
-                <input
-                    name="price"
-                    type="number"
-                    value={form.price}
-                    onChange={handleChange}
-                    required
-                    step="0.01"
-                    className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
+                    <Form.Group as={Row} className="mb-3" controlId="stock">
+                        <Form.Label column sm={3}>Stock</Form.Label>
+                        <Col sm={9}>
+                            <Form.Control type="number" name="stock" value={form.stock} onChange={handleChange} required />
+                        </Col>
+                    </Form.Group>
 
-            <div>
-                <label className="block text-gray-700 mb-1">Stock</label>
-                <input
-                    name="stock"
-                    type="number"
-                    value={form.stock}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
+                    <Form.Group as={Row} className="mb-3" controlId="category">
+                        <Form.Label column sm={3}>Category</Form.Label>
+                        <Col sm={9}>
+                            <Form.Select name="category" value={form.category} onChange={handleChange} required>
+                                <option value="">Select…</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                    </Form.Group>
 
-            <div>
-                <label className="block text-gray-700 mb-1">Category</label>
-                <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">Select category</option>
-                    {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                </select>
-            </div>
+                    <Form.Group as={Row} className="mb-3" controlId="craft">
+                        <Form.Label column sm={3}>Craft Type</Form.Label>
+                        <Col sm={9}>
+                            <Form.Select name="craft" value={form.craft} onChange={handleChange} required>
+                                <option value="">Select Craft…</option>
+                                {crafts.map(c => <option key={c} value={c}>{c}</option>)}
+                            </Form.Select>
+                        </Col>
+                    </Form.Group>
 
-            <div>
-                <label className="block text-gray-700 mb-1">Images</label>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="w-full"
-                />
-                <div className="mt-2 flex flex-wrap gap-2">
-                    {form.images.map((url, idx) => (
-                        <img key={idx} src={url} alt="Product" className="h-16 w-16 object-cover rounded" />
-                    ))}
-                </div>
-            </div>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Specifications</Form.Label>
+                        <Col sm={9}>
+                            {form.specifications.map((spec, idx) => (
+                                <Row key={idx} className="mb-2">
+                                    <Col sm={5}>
+                                        <Form.Control
+                                            placeholder="Field name"
+                                            value={spec.key}
+                                            onChange={e => handleSpecChange(idx, 'key', e.target.value)}
+                                            required
+                                        />
+                                    </Col>
+                                    <Col sm={5}>
+                                        <Form.Control
+                                            placeholder="Value"
+                                            value={spec.value}
+                                            onChange={e => handleSpecChange(idx, 'value', e.target.value)}
+                                            required
+                                        />
+                                    </Col>
+                                    <Col sm={2}>
+                                        <Button variant="danger" size="sm" onClick={() => removeSpecRow(idx)}>✕</Button>
+                                    </Col>
+                                </Row>
+                            ))}
 
-            <div className="flex items-center space-x-2">
-                <input
-                    name="available"
-                    type="checkbox"
-                    checked={form.available}
-                    onChange={handleChange}
-                    className="h-5 w-5 text-blue-600"
-                />
-                <label className="text-gray-700">Available</label>
-            </div>
+                            <Button variant="secondary" size="sm" onClick={addSpecRow}>
+                                + Add specification
+                            </Button>
+                        </Col>
+                    </Form.Group>
 
-            <button
-                type="submit"
-                className="w-full py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition"
-            >
-                {isEdit ? 'Update' : 'Create'} Product
-            </button>
-        </form>
+                    <Form.Group as={Row} className="mb-3" controlId="images">
+                        <Form.Label column sm={3}>Images</Form.Label>
+                        <Col sm={9}>
+                            <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
+                            <div className="mt-2 d-flex flex-wrap gap-2">
+                                {form.images.map((url, idx) => (
+                                    <img key={idx} src={url} alt="Product" style={{ height: '80px', width: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                                ))}
+                            </div>
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="mb-4" controlId="available">
+                        <Col sm={{ span: 9, offset: 3 }}>
+                            <Form.Check name="available" type="checkbox" label="Available" checked={form.available} onChange={handleChange} />
+                        </Col>
+                    </Form.Group>
+
+                    <div className="text-center">
+                        <Button type="submit" disabled={loading} className="px-5">
+                            {loading ? <Spinner animation="border" size="sm" /> : isEdit ? 'Update' : 'Create'}
+                        </Button>
+                    </div>
+                </Form>
+            </Card>
+        </Container>
     );
 }
