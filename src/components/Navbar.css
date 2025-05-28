@@ -202,3 +202,91 @@
     border-radius: 8px;
     cursor: pointer;
 }
+
+/* Make search bar rounder and prettier */
+.custom-search-form .search-bar-input {
+  border-radius: 30px !important; /* large rounding */
+  border: 1.5px solid #f57c00;
+  padding-left: 15px;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+.custom-search-form .search-bar-input:focus {
+  box-shadow: 0 0 8px 2px #f57c00;
+  border-color: #f57c00;
+  outline: none;
+}
+
+/* Make the search button have rounded corners matching the input */
+.custom-search-form button {
+  border-radius: 30px !important;
+  padding: 0.4rem 1.2rem;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 2px 6px rgba(245, 124, 0, 0.4);
+  transition: background-color 0.3s ease;
+}
+
+.custom-search-form button:hover {
+  background-color: #e65100;
+  box-shadow: 0 3px 10px rgba(230, 81, 0, 0.6);
+  color: white;
+}
+
+/* Shift search bar slightly to the right */
+.custom-search-form {
+  margin-left: 40px; /* shift right */
+  transform: translateX(0) !important; /* override previous translateX */
+}
+
+/* Beautify KalaMart logo with gradient background and text styling */
+.kalamart-logo {
+  background: linear-gradient(90deg, #b71c1c, #e53935, #fb8c00, #ffb300);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 1.9rem;
+  user-select: none;
+  cursor: pointer;
+  letter-spacing: 1.5px;
+  transition: filter 0.3s ease;
+}
+
+.kalamart-logo:hover {
+  filter: brightness(1.1);
+}
+
+
+/* Make all navbar icons larger */
+.navbar-icons svg,
+.navbar .nav-item svg {
+    font-size: 1.3rem !important;
+}
+
+/* Ensure the icon container is a flex row */
+.navbar-icons {
+    display: flex !important;
+    align-items: center !important;
+}
+
+    /* Give each SVG its own side‐margin and dark grey color */
+    .navbar-icons svg {
+        margin: 0 0.6rem !important; /* 1rem on left & right */
+        color: #333 !important; /* dark gray */
+        fill: #333 !important; /* in case icon paths need it */
+        transition: color 0.2s ease, transform 0.2s ease !important;
+    }
+
+        /* Hover feedback — slightly lighter gray + scale */
+        .navbar-icons svg:hover {
+            color: #555 !important;
+            fill: #555 !important;
+            transform: scale(1.1) !important;
+        }
+
+
+.navbar-icons {
+    margin-right: 2rem !important; /* adjust 2rem to taste */
+}

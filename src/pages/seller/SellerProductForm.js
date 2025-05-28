@@ -203,21 +203,38 @@ export default function SellerProductForm() {
                         </Col>
                     </Form.Group>
 
-                    <Form.Label>Specifications</Form.Label>
-                    {form.specifications.map((spec, idx) => (
-                        <Row key={idx} className="mb-2">
-                            <Col sm={5}>
-                                <Form.Control placeholder="Field name" value={spec.key} onChange={e => handleSpecChange(idx, 'key', e.target.value)} required />
-                            </Col>
-                            <Col sm={5}>
-                                <Form.Control placeholder="Value" value={spec.value} onChange={e => handleSpecChange(idx, 'value', e.target.value)} required />
-                            </Col>
-                            <Col sm={2}>
-                                <Button variant="danger" size="sm" onClick={() => removeSpecRow(idx)}>✕</Button>
-                            </Col>
-                        </Row>
-                    ))}
-                    <Button variant="secondary" size="sm" className="mb-3" onClick={addSpecRow}>+ Add specification</Button>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Specifications</Form.Label>
+                        <Col sm={9}>
+                            {form.specifications.map((spec, idx) => (
+                                <Row key={idx} className="mb-2">
+                                    <Col sm={5}>
+                                        <Form.Control
+                                            placeholder="Field name"
+                                            value={spec.key}
+                                            onChange={e => handleSpecChange(idx, 'key', e.target.value)}
+                                            required
+                                        />
+                                    </Col>
+                                    <Col sm={5}>
+                                        <Form.Control
+                                            placeholder="Value"
+                                            value={spec.value}
+                                            onChange={e => handleSpecChange(idx, 'value', e.target.value)}
+                                            required
+                                        />
+                                    </Col>
+                                    <Col sm={2}>
+                                        <Button variant="danger" size="sm" onClick={() => removeSpecRow(idx)}>✕</Button>
+                                    </Col>
+                                </Row>
+                            ))}
+
+                            <Button variant="secondary" size="sm" onClick={addSpecRow}>
+                                + Add specification
+                            </Button>
+                        </Col>
+                    </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" controlId="images">
                         <Form.Label column sm={3}>Images</Form.Label>

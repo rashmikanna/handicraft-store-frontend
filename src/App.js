@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import NavbarComponent from './components/NavbarComponent';
-
 import HomePage from './pages/HomePage';
 import ProductListing from './pages/ProductListing';
 import ProductDetails from './pages/ProductDetails';
@@ -21,10 +20,16 @@ import SellerStatus from './pages/seller/SellerStatus';
 function App() {
     return (
         <>
+
+        <div className="main-wrapper">
             <NavbarComponent />
 
             <main className="p-4">
                 <Routes>
+
+                    {/* Default route */}
+                    <Route index element={<HomePage />} />
+
                     {/* Home */}
                     <Route path="/" element={<HomePage />} />
                     <Route path="/home" element={<HomePage />} />
@@ -54,10 +59,11 @@ function App() {
                     <Route path="/seller/new" element={<SellerProductForm />} />
                     <Route path="/seller/:id/edit" element={<SellerProductForm />} />
 
-                    {/* Optional fallback */}
-                    {/* <Route path="*" element={<NotFound />} /> */}
+                    {/* Catch-all fallback to home */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>
+            </div>
         </>
     );
 }

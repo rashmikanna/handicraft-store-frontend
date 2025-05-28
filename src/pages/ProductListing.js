@@ -15,10 +15,7 @@ export default function ProductListing() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // search driven by URL
-    const [searchQ, setSearchQ] = useState(qParam);
-
-    // committed filters
+    // filters
     const [category, setCategory] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
@@ -26,7 +23,7 @@ export default function ProductListing() {
     const [sort, setSort] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
 
-    // temporary Offcanvas inputs
+    // temp inputs in offcanvas
     const [tempCategory, setTempCategory] = useState('');
     const [tempMin, setTempMin] = useState('');
     const [tempMax, setTempMax] = useState('');
@@ -34,36 +31,29 @@ export default function ProductListing() {
     const [tempTags, setTempTags] = useState([]);
     const [showFilters, setShowFilters] = useState(false);
 
-    // lists to populate selects & checkboxes
+    // lookup lists
     const [categories, setCategories] = useState([]);
     const [availableTags, setAvailableTags] = useState([]);
 
     // sync searchQ
+    const [searchQ, setSearchQ] = useState(qParam);
     useEffect(() => {
         setSearchQ(qParam);
     }, [qParam]);
 
-    // fetch categories
+    // fetch categories & tags
     useEffect(() => {
         axios.get('http://localhost:8000/api/products/categories/')
             .then(res => setCategories(res.data))
             .catch(console.error);
-    }, []);
-
-    // fetch tags, drop any empty string
-    useEffect(() => {
         axios.get('http://localhost:8000/api/products/products/tags/')
-            .then(res => {
-                const tags = res.data.filter(t => t && t.trim() !== '');
-                setAvailableTags(tags);
-            })
+            .then(res => setAvailableTags(res.data.filter(t => t && t.trim() !== '')))
             .catch(console.error);
     }, []);
 
-    // fetch products whenever filters change
+    // fetch products on filter change
     useEffect(() => {
         const q = new URLSearchParams(location.search).get('q') || '';
-        setSearchQ(q);
         setLoading(true);
         setError(null);
 
@@ -74,8 +64,7 @@ export default function ProductListing() {
         if (maxPrice) params.max_price = maxPrice;
         if (available) params.available = true;
         if (sort) params.sort = sort;
-        if (selectedTags.length)
-            params.tags = selectedTags.join(',');
+        if (selectedTags.length) params.tags = selectedTags.join(',');
 
         axios.get('http://localhost:8000/api/products/products/', { params })
             .then(res => setProducts(Array.isArray(res.data) ? res.data : []))
@@ -103,6 +92,15 @@ export default function ProductListing() {
         setShowFilters(false);
     };
 
+    // clear all filters
+    const clearFilters = () => {
+        setTempCategory('');
+        setTempMin('');
+        setTempMax('');
+        setTempAvail(false);
+        setTempTags([]);
+    };
+
     // restrict numeric input
     const handleTempMin = e => {
         if (/^\d*$/.test(e.target.value)) setTempMin(e.target.value);
@@ -127,27 +125,26 @@ export default function ProductListing() {
         <Container className="mt-4">
             {/* Header: Filters + Sort side by side */}
             <Row className="align-items-center mb-3">
-                <Col><h2>Our Handcrafted Products</h2></Col>
+                <Col>
+                    <h2 style={{
+                        fontFamily: 'Georgia, serif',
+                        fontWeight: 700,
+                        fontSize: '2rem',
+                        color: '#333'
+                    }}>
+                        Our Handcrafted Products
+                    </h2>
+                </Col>
                 <Col className="text-end">
                     <div className="d-inline-flex gap-2">
-                        <Button variant="warning" onClick={openPanel}>
-                            Filters
-                        </Button>
+                        <Button variant="warning" onClick={openPanel}>Filters</Button>
                         <Dropdown>
-                            <Dropdown.Toggle variant="warning">
-                                Sort
-                            </Dropdown.Toggle>
+                            <Dropdown.Toggle variant="warning">Sort</Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => setSort('price_asc')}>
-                                    Price: Low to High
-                                </Dropdown.Item>
-                                <Dropdown.Item onClick={() => setSort('price_desc')}>
-                                    Price: High to Low
-                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => setSort('price_asc')}>Price: Low to High</Dropdown.Item>
+                                <Dropdown.Item onClick={() => setSort('price_desc')}>Price: High to Low</Dropdown.Item>
                                 <Dropdown.Divider />
-                                <Dropdown.Item onClick={() => setSort('newest')}>
-                                    Newest
-                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => setSort('newest')}>Newest</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
@@ -155,9 +152,7 @@ export default function ProductListing() {
             </Row>
 
             {/* Offcanvas Panel */}
-            <Offcanvas show={showFilters}
-                onHide={() => setShowFilters(false)}
-                placement="start">
+            <Offcanvas show={showFilters} onHide={() => setShowFilters(false)} placement="start">
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Filters</Offcanvas.Title>
                 </Offcanvas.Header>
@@ -171,9 +166,9 @@ export default function ProductListing() {
                                 onChange={e => setTempCategory(e.target.value)}
                             >
                                 <option value="">All</option>
-                                {categories.map(c => (
-                                    <option key={c.id} value={c.id}>
-                                        {c.name}
+                                {categories.map(cat => (
+                                    <option key={cat.id || cat} value={cat.id || cat}>
+                                        {cat.name || cat}
                                     </option>
                                 ))}
                             </Form.Select>
@@ -181,32 +176,26 @@ export default function ProductListing() {
 
                         {/* Price Range */}
                         <Form.Group className="mb-3">
-                            <Form.Label>Price Range (₹)</Form.Label>
-                            <Row>
-                                <Col>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Min"
-                                        value={tempMin}
-                                        onChange={handleTempMin}
-                                    />
-                                </Col>
-                                <Col>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Max"
-                                        value={tempMax}
-                                        onChange={handleTempMax}
-                                    />
-                                </Col>
-                            </Row>
+                            <Form.Label>Price Range</Form.Label>
+                            <div className="d-flex gap-2">
+                                <Form.Control
+                                    placeholder="Min"
+                                    value={tempMin}
+                                    onChange={handleTempMin}
+                                />
+                                <Form.Control
+                                    placeholder="Max"
+                                    value={tempMax}
+                                    onChange={handleTempMax}
+                                />
+                            </div>
                         </Form.Group>
 
                         {/* Availability */}
                         <Form.Group className="mb-3">
                             <Form.Check
                                 type="checkbox"
-                                label="Only show available"
+                                label="In Stock"
                                 checked={tempAvail}
                                 onChange={e => setTempAvail(e.target.checked)}
                             />
@@ -214,7 +203,7 @@ export default function ProductListing() {
 
                         {/* Tags */}
                         <Form.Group className="mb-3">
-                            <Form.Label>Select your crafts</Form.Label>
+                            <Form.Label>Tags</Form.Label>
                             {availableTags.map(tag => (
                                 <Form.Check
                                     key={tag}
@@ -222,41 +211,77 @@ export default function ProductListing() {
                                     label={tag}
                                     checked={tempTags.includes(tag)}
                                     onChange={() => handleTagToggle(tag)}
-                                    className="mb-1"
                                 />
                             ))}
                         </Form.Group>
 
-                        {/* Apply */}
-                        <Button variant="warning" onClick={applyFilters}>
-                            Apply Filters
-                        </Button>
+                        <div className="d-flex justify-content-between">
+                            <Button variant="secondary" onClick={clearFilters}>
+                                Clear
+                            </Button>
+                            <Button variant="primary" onClick={applyFilters}>
+                                Apply
+                            </Button>
+                        </div>
                     </Form>
                 </Offcanvas.Body>
             </Offcanvas>
 
             {/* Products Grid */}
-            <Row>
-                {products.length > 0
-                    ? products.map(p => (
-                        <Col md={4} key={p.id} className="mb-4">
-                            <Card>
-                                <Card.Img
-                                    variant="top"
-                                    src={p.images?.[0] || '/default-placeholder-image.jpg'}
-                                />
-                                <Card.Body>
-                                    <Card.Title>{p.name}</Card.Title>
-                                    <Card.Text>₹{p.price}</Card.Text>
+            <Row className="g-4">
+                {products.length > 0 ? (
+                    products.map(p => (
+                        <Col md={4} key={p.id}>
+                            <Card className="h-100" style={{
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                borderRadius: '12px',
+                                transition: 'transform 0.2s'
+                            }}
+                                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+                                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <div style={{
+                                    width: '100%',
+                                    aspectRatio: '1 / 1',
+                                    overflow: 'hidden',
+                                    borderTopLeftRadius: '12px',
+                                    borderTopRightRadius: '12px'
+                                }}>
+                                    <Card.Img
+                                        variant="top"
+                                        src={p.images?.[0] || '/default-placeholder-image.jpg'}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                </div>
+
+                                <Card.Body className="d-flex flex-column">
+                                    <Card.Title style={{
+                                        fontWeight: 600,
+                                        fontSize: '1.25rem',
+                                        marginBottom: '0.25rem'
+                                    }}>
+                                        {p.name}
+                                    </Card.Title>
+                                    <Card.Text style={{
+                                        fontWeight: 700,
+                                        fontSize: '1.15rem',
+                                        color: '#E65100',
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        ₹{p.price}
+                                    </Card.Text>
                                     <Link to={`/products/${p.id}`}>
-                                        <Button variant="primary">View Details</Button>
+                                        <Button size="md" variant="primary" className="mt-auto w-100">
+                                            View Details
+                                        </Button>
                                     </Link>
                                 </Card.Body>
                             </Card>
                         </Col>
                     ))
-                    : <Col><p>No products match these filters.</p></Col>
-                }
+                ) : (
+                    <Col><p>No products match these filters.</p></Col>
+                )}
             </Row>
         </Container>
     );

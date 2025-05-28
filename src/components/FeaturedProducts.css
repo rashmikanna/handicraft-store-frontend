@@ -1,0 +1,33 @@
+/* FeaturedProducts.css */
+
+.featured-products-section {
+  background-color: #a9744f; /* Darker rich brown */
+  padding: 4rem 0;
+}
+
+.featured-products-title {
+  font-family: 'Georgia', serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffffff; /* White text for contrast */
+}
+
+.featured-products-subtext {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: #f1e7dc; /* Light beige text */
+  margin-top: 0.5rem;
+}
+
+.product-card {
+  background-color: #fff8f0;
+  border: 1px solid #d2b48c;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
