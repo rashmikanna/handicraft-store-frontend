@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
+import axios from 'axios';
+import ReCAPTCHA from 'react-google-recaptcha'; // <-- add this line
 
 export default function Signup() {
     const [username, setUsername] = useState('');
@@ -11,8 +11,9 @@ export default function Signup() {
     const [err, setErr] = useState(false);
     const [loading, setLoading] = useState(false);
     const [pwdErrors, setPwdErrors] = useState([]);
-
-    const navigate = useNavigate();
+    const [signupSuccess, setSignupSuccess] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [captchaToken, setCaptchaToken] = useState(null); // <-- captcha token state
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -21,6 +22,13 @@ export default function Signup() {
         setMsg('');
         setPwdErrors([]);
 
+        if (!captchaToken) {
+            setMsg('Please complete the reCAPTCHA');
+            setErr(true);
+            setLoading(false);
+            return;
+        }
+
         try {
             const role = 'consumer';
             const res = await axios.post('http://127.0.0.1:8000/api/signup/', {
@@ -28,15 +36,14 @@ export default function Signup() {
                 email,
                 password,
                 role,
+                recaptcha: captchaToken, // <-- send token
             });
 
-            localStorage.setItem('access', res.data.access);
-            localStorage.setItem('refresh', res.data.refresh);
-            localStorage.setItem('username', res.data.username);
-            localStorage.setItem('role', res.data.role);
+            localStorage.setItem('username', res.data.username || username);
+            localStorage.setItem('role', role);
 
-            setMsg('Signup successful!');
-            setTimeout(() => navigate('/'), 1000);
+            setMsg('Signup successful! Please check your email to verify your account.');
+            setSignupSuccess(true);
         } catch (error) {
             setErr(true);
             const pwdErrs = error.response?.data?.password_errors;
@@ -62,6 +69,7 @@ export default function Signup() {
                             required
                             value={username}
                             onChange={e => setUsername(e.target.value)}
+                            disabled={signupSuccess}
                         />
                     </Form.Group>
 
@@ -72,20 +80,44 @@ export default function Signup() {
                             required
                             value={email}
                             onChange={e => setEmail(e.target.value)}
+                            disabled={signupSuccess}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="password" className="mt-3">
+                    <Form.Group controlId="password" className="mt-3" style={{ position: 'relative' }}>
                         <Form.Label>Password</Form.Label>
                         <Form.Control
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             required
                             value={password}
                             onChange={e => setPassword(e.target.value)}
+                            disabled={signupSuccess}
                         />
+                        <span
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={{
+                                position: 'absolute',
+                                right: '10px',
+                                top: '38px',
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                                color: '#6c757d',
+                                fontSize: '1.2rem',
+                            }}
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            role="button"
+                        >
+                            {showPassword ? '🙈' : '👁️'}
+                        </span>
                     </Form.Group>
 
-                    {/* Backend password validation messages */}
+                    <div className="mt-3 d-flex justify-content-center">
+                        <ReCAPTCHA
+                            sitekey="6LcBT00rAAAAALAAlmNoLopNZyqtJ9goLbokwMJr" // 🗝️ Replace with your actual site key
+                            onChange={token => setCaptchaToken(token)}
+                        />
+                    </div>
+
                     {pwdErrors.length > 0 && (
                         <Alert variant="warning" className="mt-2">
                             <ul className="mb-0">
@@ -98,16 +130,31 @@ export default function Signup() {
                         variant="primary"
                         type="submit"
                         className="mt-4 w-100"
-                        disabled={loading}
+                        disabled={loading || signupSuccess}
                     >
                         {loading ? <Spinner animation="border" size="sm" /> : 'Sign Up'}
                     </Button>
                 </Form>
 
                 {msg && (
-                    <Alert variant={err ? 'danger' : 'success'} className="mt-3">
+                    <Alert variant={err ? 'danger' : 'success'} className="mt-3" style={{ fontWeight: '600' }}>
                         {msg}
                     </Alert>
+                )}
+
+                {signupSuccess && (
+                    <div className="text-center mt-4 p-3" style={{
+                        color: '#2c3e50',
+                        fontWeight: '700',
+                        fontSize: '1.1rem',
+                        backgroundColor: '#d4edda',
+                        border: '2px solid #28a745',
+                        borderRadius: '8px',
+                        userSelect: 'none',
+                        pointerEvents: 'none',
+                    }}>
+                        🎉 If your account is verified successfully, you can now <strong>login</strong>.
+                    </div>
                 )}
             </Card>
         </Container>

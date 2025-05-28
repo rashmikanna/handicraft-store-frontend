@@ -17,6 +17,9 @@ import SellerProductList from './pages/seller/SellerProductList';
 import SellerProductForm from './pages/seller/SellerProductForm';
 import SellerStatus from './pages/seller/SellerStatus';
 
+// Import Verify component
+import Verify from './pages/Verify';  // <-- Make sure path is correct!
+
 function App() {
     return (
         <>
@@ -50,6 +53,9 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
 
+                    {/* New: Account verification */}
+                    <Route path="/verify/:uidb64/:token" element={<Verify />} />
+
                     {/* Seller signup */}
                     <Route path="/signup/seller" element={<SellerSignup />} />
                     <Route path="/seller-panel/status" element={<SellerStatus />} />
@@ -68,4 +74,4 @@ function App() {
     );
 }
 
-export default App;                
+export default App;

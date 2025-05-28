@@ -1,0 +1,53 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+
+.verify-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+}
+
+.verify-card {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 50px 30px;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+    opacity: 1;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
+.verify-message {
+    margin-top: 20px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.verify-icon {
+    font-size: 70px;
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+}
+
+.verify-icon.success {
+    color: #2ecc71;
+}
+
+.verify-icon.error {
+    color: #e74c3c;
+}
+
+.verify-spinner {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 15px;
+}
