@@ -20,7 +20,8 @@ function Login() {
         password,
       });
 
-      // Save tokens to localStorage
+        // Save tokens to localStorage
+      console.log("Received tokens:", response.data);
       localStorage.setItem('access', response.data.access);
       localStorage.setItem('refresh', response.data.refresh);
       navigate('/');

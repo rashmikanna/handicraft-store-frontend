@@ -78,8 +78,8 @@
 .navbar .nav-item svg {
     transition: transform 0.3s ease, color 0.3s ease; /* Smooth transitions for scale and color */
     color: #555; /* Default icon color */
-    width: 24px; /* Adjust icon size */
-    height: 24px;
+    width: 60px; /* Adjust icon size */
+    height: 60px;
     cursor: pointer; /* Makes the cursor indicate interactivity */
   }
   
