@@ -10,6 +10,9 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import OrderHistory from './pages/OrderHistory';
+import OrderSummary from './pages/OrderSummary'; // ✅ Make sure this import exists
+
 
 // Seller pages
 import SellerSignup from './pages/seller/SellerSignup';
@@ -44,6 +47,9 @@ function App() {
                     {/* Cart & Checkout */}
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/orders/history" element={<OrderHistory />} />
+                    <Route path="/orders/:id" element={<OrderSummary />} />
+
 
                     {/* Static */}
                     <Route path="/contact" element={<Contact />} />

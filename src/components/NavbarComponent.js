@@ -11,6 +11,7 @@ import {
     FaExchangeAlt
 } from 'react-icons/fa';
 import './Navbar.css';
+import { useCart } from '../context/CartContext';
 
 const dummyProducts = [
     'Wooden Vase',
@@ -38,6 +39,7 @@ export default function NavbarComponent() {
     const [suggestions, setSuggestions] = useState([]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showAccountOptions, setShowAccountOptions] = useState(false);
+    const { cart } = useCart();
 
     // Auth & role state
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -79,6 +81,8 @@ export default function NavbarComponent() {
         setSellerMode(false);
         navigate('/login');
     };
+
+    const totalQuantity = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
     // Start Selling logic: correct redirect based on login & seller state
     const handleStartSelling = () => {
@@ -130,7 +134,34 @@ export default function NavbarComponent() {
                             <div className="navbar-icons d-flex align-items-center gap-3">
                                 <FaHome onClick={() => navigate('/')} />
                                 <FaThList onClick={() => navigate('/products')} />
-                                <FaShoppingCart onClick={() => navigate('/cart')} />
+                                <div
+                                    className="nav-item position-relative"
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate('/cart')}
+                                    title="Cart"
+                                    >
+                                    <FaShoppingCart size={10} />
+                                        {totalQuantity > 0 && (
+                                            <span
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-5px',
+                                                right: '-10px',
+                                                background: 'red',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                padding: '2px 6px',
+                                                fontSize: '12px',
+                                                fontWeight: 'bold',
+                                                minWidth: '20px',
+                                                textAlign: 'center',
+                                            }}
+                                            >
+                                            {totalQuantity}
+                                            </span>
+                                        )}
+                                    </div>
+
                                 <FaBell />
                                 <FaHeart />
                                 <div onMouseEnter={() => setShowAccountOptions(true)} onMouseLeave={() => setShowAccountOptions(false)}>
