@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
-import ReCAPTCHA from 'react-google-recaptcha'; // <-- add this line
+import ReCAPTCHA from 'react-google-recaptcha'; 
+import { Link } from 'react-router-dom';
+
 
 export default function Signup() {
     const [username, setUsername] = useState('');
@@ -13,7 +15,7 @@ export default function Signup() {
     const [pwdErrors, setPwdErrors] = useState([]);
     const [signupSuccess, setSignupSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [captchaToken, setCaptchaToken] = useState(null); // <-- captcha token state
+    const [captchaToken, setCaptchaToken] = useState(null); 
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -36,7 +38,7 @@ export default function Signup() {
                 email,
                 password,
                 role,
-                recaptcha: captchaToken, // <-- send token
+                recaptcha: captchaToken, 
             });
 
             localStorage.setItem('username', res.data.username || username);
@@ -113,7 +115,7 @@ export default function Signup() {
 
                     <div className="mt-3 d-flex justify-content-center">
                         <ReCAPTCHA
-                            sitekey="6LcBT00rAAAAALAAlmNoLopNZyqtJ9goLbokwMJr" // 🗝️ Replace with your actual site key
+                            sitekey="6LcBT00rAAAAALAAlmNoLopNZyqtJ9goLbokwMJr" 
                             onChange={token => setCaptchaToken(token)}
                         />
                     </div>
@@ -136,11 +138,21 @@ export default function Signup() {
                     </Button>
                 </Form>
 
+
+                <div className="text-center mt-3">
+                    Already have an account?{' '}
+                    <Link to="/login" style={{ fontWeight: '600' }}>
+                        Login here
+                    </Link>
+                </div>
+
+
                 {msg && (
                     <Alert variant={err ? 'danger' : 'success'} className="mt-3" style={{ fontWeight: '600' }}>
                         {msg}
                     </Alert>
                 )}
+
 
                 {signupSuccess && (
                     <div className="text-center mt-4 p-3" style={{

@@ -1,8 +1,10 @@
-﻿.hamburger-icon {
+﻿//Navbar.css
+
+.hamburger-icon {
     cursor: pointer;
     margin-right: 10px;
     color: #333;
-  }
+}
   
   .sidebar {
     position: fixed;
@@ -78,8 +80,8 @@
 .navbar .nav-item svg {
     transition: transform 0.3s ease, color 0.3s ease; /* Smooth transitions for scale and color */
     color: #555; /* Default icon color */
-    width: 60px; /* Adjust icon size */
-    height: 60px;
+    width: 23px;
+    height: 23px;
     cursor: pointer; /* Makes the cursor indicate interactivity */
   }
   
@@ -273,7 +275,7 @@
 
     /* Give each SVG its own side‐margin and dark grey color */
     .navbar-icons svg {
-        margin: 0 0.6rem !important; /* 1rem on left & right */
+        margin: 0 0.5rem !important; /* 1rem on left & right */
         color: #333 !important; /* dark gray */
         fill: #333 !important; /* in case icon paths need it */
         transition: color 0.2s ease, transform 0.2s ease !important;
@@ -290,3 +292,4 @@
 .navbar-icons {
     margin-right: 2rem !important; /* adjust 2rem to taste */
 }
+
