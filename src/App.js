@@ -23,6 +23,8 @@ import SellerProductList from './pages/seller/SellerProductList';
 import SellerProductForm from './pages/seller/SellerProductForm';
 import SellerStatus from './pages/seller/SellerStatus';
 
+import SellerOrders from './pages/seller/SellerOrders';
+
 // Import Verify component
 import Verify from './pages/Verify';  // <-- Make sure path is correct!
 
@@ -80,6 +82,9 @@ function App() {
 
                     {/*Explore Collections */}
                     <Route path="/collections" element={<ExploreCollections />} />
+
+                    
+                    <Route path="/seller/orders" element={<SellerOrders />} />
 
                     {/* Catch-all fallback to home */}
                     <Route path="*" element={<Navigate to="/" replace />} />
