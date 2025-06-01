@@ -1,15 +1,18 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import NavbarComponent from './components/NavbarComponent';
+import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import ProductListing from './pages/ProductListing';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Contact from './pages/Contact';
+import ExploreCollections from './pages/ExploreCollections';
 import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Sellers from './pages/Sellers'; // ⬅️ Add this at the top with your imports
 import OrderHistory from './pages/OrderHistory';
 import OrderSummary from './pages/OrderSummary'; // ✅ Make sure this import exists
 
@@ -29,6 +32,7 @@ function App() {
 
         <div className="main-wrapper">
             <NavbarComponent />
+            <ScrollToTop />
 
             <main className="p-4">
                 <Routes>
@@ -70,6 +74,12 @@ function App() {
                     <Route path="/seller" element={<SellerProductList />} />
                     <Route path="/seller/new" element={<SellerProductForm />} />
                     <Route path="/seller/:id/edit" element={<SellerProductForm />} />
+
+                    {/*Meet the Seller */}
+                    <Route path="/sellers" element={<Sellers />} />
+
+                    {/*Explore Collections */}
+                    <Route path="/collections" element={<ExploreCollections />} />
 
                     {/* Catch-all fallback to home */}
                     <Route path="*" element={<Navigate to="/" replace />} />

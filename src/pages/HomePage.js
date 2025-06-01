@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Carousel } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import FeaturedProducts from '../components/FeaturedProducts';
 
@@ -9,6 +10,8 @@ function HomePage() {
     'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163501/neyt2jkzclce2bly72gs.jpg',
     'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163637/jycyoedz2qjeszuzaqfy.jpg',
   ];
+
+  const navigate = useNavigate(); 
 
   return (
     <Container className="text-center mt-5">
@@ -62,7 +65,7 @@ function HomePage() {
               <p>
                 Get to know the incredible humans behind the craft—skilled hands, proud traditions, and personal stories stitched into every piece.
               </p>
-              <button className="info-button" onClick={() => window.location.href = "/sellers"}>
+              <button className="info-button" onClick={() => navigate('/sellers')}>
                 Learn More
               </button>
             </div>
@@ -95,7 +98,7 @@ function HomePage() {
               <p>
                 Dive into a world of textiles, metal crafts, wood carvings, and more—each item with a soul, story, and signature style.
               </p>
-              <button className="info-button" onClick={() => window.location.href = "/products-info"}>
+              <button className="info-button" onClick={() => navigate('/collections')}>
                 Learn More
               </button>
             </div>
