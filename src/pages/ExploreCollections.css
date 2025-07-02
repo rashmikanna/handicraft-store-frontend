@@ -1,0 +1,46 @@
+/* src/pages/ExploreCollections.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap');
+
+.collections-container {
+  padding: 3rem 2rem;
+  background: linear-gradient(to right, #f9f4ef, #f1e3d3);
+  font-family: 'Open Sans', sans-serif;
+}
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #4b2e2e;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.category-card {
+  background-color: #ffffffee;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-left: 6px solid #b57b3d;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+}
+
+.category-card h2 {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+  color: #7a4a26;
+  font-family: 'Playfair Display', serif;
+}
+
+.category-card p {
+  font-size: 1.1rem;
+  color: #444;
+  line-height: 1.9;
+  text-align: justify;
+}
+
