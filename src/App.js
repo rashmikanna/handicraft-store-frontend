@@ -11,17 +11,15 @@ import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import OrderHistory from './pages/OrderHistory';
-import OrderSummary from './pages/OrderSummary'; // ✅ Make sure this import exists
-
-
+import OrderSummary from './pages/OrderSummary'; 
+import WishlistPage from './pages/WishlistPage';  
+import HelpFAQ from './pages/HelpFAQ';
 // Seller pages
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerProductList from './pages/seller/SellerProductList';
 import SellerProductForm from './pages/seller/SellerProductForm';
 import SellerStatus from './pages/seller/SellerStatus';
-
-// Import Verify component
-import Verify from './pages/Verify';  // <-- Make sure path is correct!
+import Verify from './pages/Verify';  
 
 function App() {
     return (
@@ -54,6 +52,9 @@ function App() {
                     {/* Static */}
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/help" element={<HelpFAQ />} />
+                    {/* Wishlist */}
+                    <Route path="/wishlist" element={<WishlistPage />} />
 
                     {/* Auth */}
                     <Route path="/login" element={<Login />} />

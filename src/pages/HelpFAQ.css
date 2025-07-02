@@ -1,0 +1,31 @@
+/* src/pages/HelpFaq.css */
+
+.help-faq-container h1 {
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+}
+
+.help-faq-container .accordion-button {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.help-faq-container .accordion-body p,
+.help-faq-container .accordion-body ul,
+.help-faq-container .accordion-body ol {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.help-faq-container ul.list-unstyled li {
+  margin-bottom: 0.75rem;
+}
+
+.help-faq-container a {
+  color: #ff9900;
+  text-decoration: none;
+}
+
+.help-faq-container a:hover {
+  text-decoration: underline;
+}

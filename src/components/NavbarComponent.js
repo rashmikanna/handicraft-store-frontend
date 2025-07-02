@@ -13,6 +13,7 @@ import {
     FaExchangeAlt
 } from 'react-icons/fa';
 import './Navbar.css';
+import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 const dummyProducts = [
@@ -24,14 +25,18 @@ const dummyProducts = [
     'Woven Basket'
 ];
 
-const sidebarItems = [
-    { title: "Trending Now", links: ["Top-Selling Crafts", "Customer Favorites", "Just Launched", "Festival Specials"] },
-    { title: "Handloom Collection", links: ["Sarees", "Dupattas", "Fabrics", "Scarves", "Stoles"] },
-    { title: "Handicrafts & Art", links: ["Clay & Terracotta", "Brass & Metalware", "Wooden Toys", "Cherial Scrolls", "Palm Leaf Creations"] },
-    { title: "New Arrivals", links: ["Recently Added", "Featured Artisans", "Limited Editions", "Seasonal Picks"] },
-    { title: "Modern Living", links: ["Eco Essentials", "Home Decor", "Fashion Accessories", "Bags & Jewelry"] },
-    { title: "Gift Ideas", links: ["Under ₹500", "Artisanal Combos", "Occasion-Based Gifts", "Gift Cards"] }
-];
+const sidebarItemsFlat = [
+      { title: 'Under ₹500', path: '/products?max_price=500' },
+      { title: 'New Arrivals', path: '/products?sort=new' },
+      { title: 'Handloom Collection', path: '/products?category=handloom' },
+      { title: 'Gift Ideas', path: '/products?category=gift' },
+
+      { title: 'Wishlist', path: '/wishlist' },
+      { title: 'Order History', path: '/orders/history' },
+      { title: 'About Us', path: '/about' },
+      { title: 'Contact Us', path: '/contact' },
+      { title: 'Help / FAQ', path: '/help' },
+ ];
 
 export default function NavbarComponent() {
     const navigate = useNavigate();
@@ -134,7 +139,7 @@ export default function NavbarComponent() {
 
                             {/* Buyer icons */}
                             <div className="navbar-icons d-flex align-items-center gap-3">
-                                <FaHome onClick={() => navigate('/')} />
+                                <FaHome size={23} onClick={() => navigate('/')} />
                                 <FaThList onClick={() => navigate('/products')} />
                                 <div
                                     className="nav-item position-relative"
@@ -164,8 +169,17 @@ export default function NavbarComponent() {
                                         )}
                                     </div>
 
-                                <FaBell />
-                                <FaHeart />
+                                <div
+                                    className="wishlist-icon"
+                                    onClick={() => navigate('/wishlist')}
+                                    title="Wishlist"
+                                    >
+                                    <FaHeart size={21} />
+                                 </div>
+
+                                <FaBell size={22} />
+
+
                                 <div onMouseEnter={() => setShowAccountOptions(true)} onMouseLeave={() => setShowAccountOptions(false)}>
                                     <FaUser />
                                     {showAccountOptions && (
@@ -220,13 +234,95 @@ export default function NavbarComponent() {
             {sidebarOpen && (
                 <>
                     <div className="sidebar open">
-                        {sidebarItems.map((section, idx) => (
-                            <div key={idx} className="sidebar-section">
-                                <h5>{section.title}</h5>
-                                <ul>{section.links.map(link => <li key={link}>{link}</li>)}</ul>
+                        <div className="sidebar-header">
+                            <div
+                                className="sidebar-title kalamart-logo"
+                                onClick={() => {
+                                    navigate('/');        // optional: clicking logo navigates home
+                                    setSidebarOpen(false);
+                                }}
+                            >
+                                KalaMart
                             </div>
-                        ))}
+                            <span className="close-btn" onClick={() => setSidebarOpen(false)}>
+                                ×
+                            </span>
+                        </div>
+
+                        <div className="sidebar-section">
+                            <div className="sidebar-heading">Shop Categories</div>
+                            <ul className="sidebar-list">
+                                {sidebarItemsFlat.slice(0, 4).map((item, idx) => (
+                                    <li key={idx} className="sidebar-item">
+                                        <Link
+                                            to={item.path}
+                                            onClick={() => setSidebarOpen(false)}
+                                            style={{
+                                                textDecoration: 'none',
+                                                color: '#333',
+                                                fontWeight: 500,
+                                                display: 'block',
+                                                padding: '8px 0'
+                                            }}
+                                        >
+                                            {item.title}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <hr className="sidebar-divider" />
+
+                        <div className="sidebar-section">
+                            <div className="sidebar-heading">Account &amp; Info</div>
+                            <ul className="sidebar-list">
+                                {sidebarItemsFlat.slice(4,7).map((item, idx) => (
+                                    <li key={idx} className="sidebar-item">
+                                        <Link
+                                            to={item.path}
+                                            onClick={() => setSidebarOpen(false)}
+                                            style={{
+                                                textDecoration: 'none',
+                                                color: '#333',
+                                                fontWeight: 500,
+                                                display: 'block',
+                                                padding: '8px 0'
+                                            }}
+                                        >
+                                            {item.title}
+                                        </Link>
+                                    </li>
+                                ))}
+
+                            </ul>
+                        </div>
+                        <hr className="sidebar-divider" />
+                        <div className="sidebar-section">
+                            <div className="sidebar-heading">Support</div>
+                            <ul className="sidebar-list">
+                                {sidebarItemsFlat.slice(7).map((item, idx) => (
+                                    <li key={idx} className="sidebar-item">
+                                        <Link
+                                            to={item.path}
+                                            onClick={() => setSidebarOpen(false)}
+                                            style={{
+                                                textDecoration: 'none',
+                                                color: '#333',
+                                                fontWeight: 500,
+                                                display: 'block',
+                                                padding: '8px 0'
+                                            }}
+                                        >
+                                            {item.title}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
                     </div>
+
                     <div className="overlay" onClick={() => setSidebarOpen(false)} />
                 </>
             )}

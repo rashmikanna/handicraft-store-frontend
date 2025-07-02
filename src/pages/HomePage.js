@@ -5,9 +5,9 @@ import FeaturedProducts from '../components/FeaturedProducts';
 
 function HomePage() {
   const images = [
-    'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163427/d3krqj2iszg8t61achtr.jpg',
-    'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163501/neyt2jkzclce2bly72gs.jpg',
-    'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163637/jycyoedz2qjeszuzaqfy.jpg',
+    'https://res.cloudinary.com/dus8mpxbe/image/upload/WhatsApp_Image_2025-05-31_at_3.58.41_PM_smxt4a.jpg',
+    'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163501/WhatsApp_Image_2025-05-31_at_4.05.40_PM_qp6z5j.jpg',
+    'https://res.cloudinary.com/dus8mpxbe/image/upload/v1746163637/WhatsApp_Image_2025-05-31_at_4.07.21_PM_k45zmh.jpg',
   ];
 
   return (

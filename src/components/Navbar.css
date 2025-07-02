@@ -1,12 +1,12 @@
-﻿//Navbar.css
+﻿/*Navbar.css*/ 
 
 .hamburger-icon {
     cursor: pointer;
     margin-right: 10px;
     color: #333;
 }
-  
-  .sidebar {
+
+.sidebar {
     position: fixed;
     top: 0;
     left: -280px;
@@ -18,55 +18,60 @@
     padding: 20px;
     transition: all 0.3s ease;
     overflow-y: auto;
-  }
-  
-  .sidebar.open {
-    left: 0;
-  }
-  
-  .sidebar-header {
+}
+
+    .sidebar.open {
+        left: 0;
+    }
+
+.sidebar-header {
     display: flex;
-    justify-content: flex-end;
-  }
-  
-  .sidebar .close-btn {
+    justify-content: flex-start; /* ← make items start at left */
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.close-btn {
     font-size: 24px;
     cursor: pointer;
-  }
-  
-  .sidebar-section {
-    margin-top: 20px;
-  }
-  
-  .sidebar-section h5 {
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #222;
-  }
-  
-  .sidebar-section ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  
-  .sidebar-section ul li {
-    padding: 6px 0;
-    cursor: pointer;
     color: #555;
-    transition: 0.2s;
-  }
-  
-  .sidebar-section ul li:hover {
-    color: #f57c00;
-    transform: translateX(4px);
-  }
+    margin-left: auto; 
+}
 
-  .custom-search-form {
+.sidebar-section {
+    margin-top: 20px;
+}
+
+    .sidebar-section h5 {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #222;
+    }
+
+    .sidebar-section ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+        .sidebar-section ul li {
+            padding: 6px 0;
+            cursor: pointer;
+            color: #555;
+            transition: 0.2s;
+        }
+
+            .sidebar-section ul li:hover {
+                color: #f57c00;
+                transform: translateX(4px);
+            }
+
+.custom-search-form {
     transform: translateX(-60px); /* Try -10px, adjust as needed */
-  }
-  
-  
-  .overlay {
+}
+
+.overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -74,53 +79,67 @@
     width: 100%;
     background-color: rgba(0,0,0,0.3);
     z-index: 1040;
-  }
+}
 
- /* For better visual interaction */
+/* For better visual interaction */
 .navbar .nav-item svg {
     transition: transform 0.3s ease, color 0.3s ease; /* Smooth transitions for scale and color */
     color: #555; /* Default icon color */
     width: 23px;
     height: 23px;
     cursor: pointer; /* Makes the cursor indicate interactivity */
-  }
-  
-  /* Wiggle effect using keyframes */
-  @keyframes wiggle {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(5deg); }
-    50% { transform: rotate(-5deg); }
-    75% { transform: rotate(3deg); }
-    100% { transform: rotate(0deg); }
-  }
-  
-  /* Apply wiggle effect on hover for all icons */
-  .navbar .nav-item:hover svg {
+}
+
+/* Wiggle effect using keyframes */
+@keyframes wiggle {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    50% {
+        transform: rotate(-5deg);
+    }
+
+    75% {
+        transform: rotate(3deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+/* Apply wiggle effect on hover for all icons */
+.navbar .nav-item:hover svg {
     animation: wiggle 0.6s ease; /* Apply the wiggle animation */
     color: #ff9900; /* Color change on hover */
     transform: scale(1.1); /* Slightly scale the icon */
-  }
-  
-  /* Hover effect for all icons */
-  .navbar .nav-item:hover svg {
+}
+
+/* Hover effect for all icons */
+.navbar .nav-item:hover svg {
     color: #ff9900; /* Add a hover color to make them pop */
-  }
-  
-  /* Styling for individual navbar items (to align them properly) */
-  .navbar .navbar-icons {
+}
+
+/* Styling for individual navbar items (to align them properly) */
+.navbar .navbar-icons {
     display: flex;
     align-items: center;
-  }
-  
-  .navbar .nav-item {
+}
+
+.navbar .nav-item {
     display: flex;
     align-items: center;
     margin-right: 20px;
     cursor: pointer; /* Makes the cursor indicate interactivity */
-  }
-  
-  /* Styling for the account options dropdown */
-  .account-options {
+}
+
+/* Styling for the account options dropdown */
+.account-options {
     position: absolute;
     top: 30px;
     background-color: white;
@@ -129,48 +148,48 @@
     padding: 10px;
     width: 100px;
     z-index: 10;
-  }
-  
-  .account-options ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .account-options li {
-    padding: 5px;
-    cursor: pointer;
-    color: #333;
-  }
-  
-  .account-options li:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* Navbar collapse animation */
-  .navbar .navbar-collapse {
+}
+
+    .account-options ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .account-options li {
+        padding: 5px;
+        cursor: pointer;
+        color: #333;
+    }
+
+        .account-options li:hover {
+            background-color: #f1f1f1;
+        }
+
+/* Navbar collapse animation */
+.navbar .navbar-collapse {
     display: flex;
     justify-content: flex-end;
-  }
-  
-  .navbar .navbar-toggle {
+}
+
+.navbar .navbar-toggle {
     border: none;
     background-color: transparent;
     font-size: 28px;
     color: #555;
-  }
-  
-  .navbar .navbar-toggle:focus {
-    outline: none;
-  }
-  
-  /* Optional: Custom styling for the navbar brand */
-  .navbar .navbar-brand {
+}
+
+    .navbar .navbar-toggle:focus {
+        outline: none;
+    }
+
+/* Optional: Custom styling for the navbar brand */
+.navbar .navbar-brand {
     font-size: 24px;
     font-weight: bold;
-  }
-  
-  .dropdown-suggestions {
+}
+
+.dropdown-suggestions {
     position: absolute;
     top: 100%;
     left: 0;
@@ -184,16 +203,16 @@
     padding: 0;
     max-height: 200px;
     overflow-y: auto;
-  }
-  
-  .dropdown-suggestions li {
-    padding: 8px 12px;
-    cursor: pointer;
-  }
-  
-  .dropdown-suggestions li:hover {
-    background-color: #f5f5f5;
-  }
+}
+
+    .dropdown-suggestions li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+        .dropdown-suggestions li:hover {
+            background-color: #f5f5f5;
+        }
 
 .start-selling-btn {
     background: transparent;
@@ -207,59 +226,58 @@
 
 /* Make search bar rounder and prettier */
 .custom-search-form .search-bar-input {
-  border-radius: 30px !important; /* large rounding */
-  border: 1.5px solid #f57c00;
-  padding-left: 15px;
-  font-size: 1rem;
-  box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
-  transition: box-shadow 0.3s ease;
+    border-radius: 30px !important; /* large rounding */
+    border: 1.5px solid #f57c00;
+    padding-left: 15px;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+    transition: box-shadow 0.3s ease;
 }
 
-.custom-search-form .search-bar-input:focus {
-  box-shadow: 0 0 8px 2px #f57c00;
-  border-color: #f57c00;
-  outline: none;
-}
+    .custom-search-form .search-bar-input:focus {
+        box-shadow: 0 0 8px 2px #f57c00;
+        border-color: #f57c00;
+        outline: none;
+    }
 
 /* Make the search button have rounded corners matching the input */
 .custom-search-form button {
-  border-radius: 30px !important;
-  padding: 0.4rem 1.2rem;
-  font-weight: 600;
-  border: none;
-  box-shadow: 0 2px 6px rgba(245, 124, 0, 0.4);
-  transition: background-color 0.3s ease;
+    border-radius: 30px !important;
+    padding: 0.4rem 1.2rem;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 2px 6px rgba(245, 124, 0, 0.4);
+    transition: background-color 0.3s ease;
 }
 
-.custom-search-form button:hover {
-  background-color: #e65100;
-  box-shadow: 0 3px 10px rgba(230, 81, 0, 0.6);
-  color: white;
-}
+    .custom-search-form button:hover {
+        background-color: #e65100;
+        box-shadow: 0 3px 10px rgba(230, 81, 0, 0.6);
+        color: white;
+    }
 
 /* Shift search bar slightly to the right */
 .custom-search-form {
-  margin-left: 40px; /* shift right */
-  transform: translateX(0) !important; /* override previous translateX */
+    margin-left: 40px; /* shift right */
+    transform: translateX(0) !important; /* override previous translateX */
 }
 
 /* Beautify KalaMart logo with gradient background and text styling */
 .kalamart-logo {
-  background: linear-gradient(90deg, #b71c1c, #e53935, #fb8c00, #ffb300);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 800;
-  font-size: 1.9rem;
-  user-select: none;
-  cursor: pointer;
-  letter-spacing: 1.5px;
-  transition: filter 0.3s ease;
+    background: linear-gradient(90deg, #b71c1c, #e53935, #fb8c00, #ffb300);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    font-size: 1.9rem;
+    user-select: none;
+    cursor: pointer;
+    letter-spacing: 1.5px;
+    transition: filter 0.3s ease;
 }
 
-.kalamart-logo:hover {
-  filter: brightness(1.1);
-}
-
+    .kalamart-logo:hover {
+        filter: brightness(1.1);
+    }
 
 /* Make all navbar icons larger */
 .navbar-icons svg,
@@ -273,23 +291,109 @@
     align-items: center !important;
 }
 
-    /* Give each SVG its own side‐margin and dark grey color */
     .navbar-icons svg {
-        margin: 0 0.5rem !important; /* 1rem on left & right */
+        margin: 0 0.5rem !important; /* 0.5rem on left & right */
         color: #333 !important; /* dark gray */
         fill: #333 !important; /* in case icon paths need it */
         transition: color 0.2s ease, transform 0.2s ease !important;
     }
 
-        /* Hover feedback — slightly lighter gray + scale */
         .navbar-icons svg:hover {
             color: #555 !important;
             fill: #555 !important;
             transform: scale(1.1) !important;
         }
 
-
 .navbar-icons {
     margin-right: 2rem !important; /* adjust 2rem to taste */
+}
+
+.sidebar-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-item {
+    /* Generous vertical padding to give breathing room */
+    padding: 12px 16px;
+    /* A neutral dark‐gray color instead of pure black */
+    color: #444;
+    cursor: pointer;
+}
+
+    .sidebar-item a {
+        display: block;
+        text-decoration: none;
+        color: #444; /* match the <li> color */
+        font-weight: 500;
+    }
+
+    .sidebar-item:hover a {
+        background-color: #f0f0f0;
+    }
+
+    .sidebar-item:nth-child(5) {
+        border-top: 1px solid #ddd; /* a very light gray line */
+        margin-top: 8px; /* extra gap above */
+        padding-top: 16px; /* ensure text doesn’t bump up against the line */
+    }
+
+    /* 6) Small gap between successive items for breathing room */
+    .sidebar-item + .sidebar-item {
+        margin-top: 4px;
+    }
+
+/* (Optional) If you want your “practical” links to be slightly lighter or smaller,
+   uncomment one or both blocks below and tweak as needed. */
+
+/* Make “practical” links a shade lighter */
+
+.sidebar-item:nth-child(n+5) a {
+    color: #555;
+}
+
+
+/* Make “practical” links a bit smaller in font size */
+
+.sidebar-item:nth-child(n+5) a {
+    font-size: 0.95rem;
+}
+
+.sidebar-heading {
+    font-weight: 700; /* bold */
+    font-size: 1rem;
+    color: #222; /* pure black‐ish */
+    margin-top: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+/* 2) Force your sidebar links to be a softer gray by default */
+.sidebar-item a {
+    display: block;
+    text-decoration: none;
+    color: #777; /* medium gray */
+    font-weight: 500; /* normal weight */
+    padding: 6px 0; /* vertical spacing */
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+    /* 3) On hover, keep the link darker/orange */
+    .sidebar-item a:hover {
+        color: #f57c00; /* highlight color on hover */
+        background-color: rgba(245, 124, 0, 0.05);
+    }
+
+/* 4) If you still need a dividing line above “practical” links, bump those to n+5 */
+.sidebar-item:nth-child(n + 5) a {
+    margin-top: 8px; /* extra gap above these items */
+    font-size: 0.95rem; /* slightly smaller, optional */
+    color: #666; /* even lighter gray than the top section */
+}
+
+/* 5) Make sure headings and items aren’t sharing the same padding—headings don’t need 'sidebar-item' styling */
+.sidebar-section {
+    margin-top: 20px;
 }
 
