@@ -1,5 +1,3 @@
-// src/pages/ProductDetails.js
-
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -19,326 +17,287 @@ import {
 } from 'react-bootstrap';
 import { FaShoppingCart, FaHeart, FaRegHeart } from 'react-icons/fa';
 
-function ProductDetails() {
+export default function ProductDetails() {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const { cart, addToCart, removeFromCart, updateQuantity } = useContext(CartContext);
+
     const [product, setProduct] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+    const [inWishlist, setInWishlist] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [carouselIndex, setCarouselIndex] = useState(0);
-    const { cart, addToCart, removeFromCart, updateQuantity } = useContext(CartContext);
-    const [inWishlist, setInWishlist] = useState(false);
 
-    const [reviews, setReviews] = useState([]);
-    const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
-
-    const siteBgColor = '#F2EFEA';
-    const navigate = useNavigate();
-
+    // Load product, reviews, wishlist status
     useEffect(() => {
+        const token = localStorage.getItem('access');
         setLoading(true);
         setError(null);
 
         // Fetch product details
         axios.get(`http://localhost:8000/api/products/products/${id}/`)
-            .then(res => {
-                setProduct(res.data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setError('Failed to load product details.');
-                setLoading(false);
-            });
+            .then(res => setProduct(res.data))
+            .catch(() => setError('Failed to load product.'));
 
-        // Fetch reviews for this product
+        // Fetch reviews
         axios.get(`http://localhost:8000/api/products/${id}/reviews/`)
             .then(res => setReviews(res.data))
-            .catch(err => {
-                console.error('Error loading reviews:', err);
-                // Don't fail entire page for reviews error
-            });
+            .catch(() => {/* ignore reviews errors */ });
 
-        // Check if product is in wishlist
-        const token = localStorage.getItem('access');
+        // Check if this product is in the user's wishlist
         if (token) {
-            axios.get('http://localhost:8000/api/users/wishlist/', {
+            axios.get('http://localhost:8000/api/usersdata/wishlist/', {
                 headers: { Authorization: `Bearer ${token}` }
             })
-                .then(res => {
-                    const productIds = (res.data.products || []).map(p => p.id);
-                    setInWishlist(productIds.includes(id));
-                })
-                .catch(() => {
-                    // ignore if not logged in or no wishlist
-                });
+                .then(res => setInWishlist(res.data.some(p => p.id === id)))
+                .catch(() => {/* ignore wishlist status errors */ });
         }
+
+        setLoading(false);
     }, [id]);
 
-    const handleSelect = (selectedIndex) => {
-        setCarouselIndex(selectedIndex);
-    };
-
-    const handleReviewSubmit = (e) => {
-        e.preventDefault();
-        if (!newReview.comment) return; // simple validation
-
-        const token = localStorage.getItem('access');
-        if (!token) {
-            alert('You must be logged in to submit a review.');
-            return;
-        }
-
-        axios.post(
-            `http://localhost:8000/api/products/${id}/reviews/`,
-            newReview,
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        )
-            .then(res => {
-                setReviews(prev => [...prev, res.data]);
-                setNewReview({ rating: 5, comment: '' });
-            })
-            .catch(err => {
-                console.error('Error submitting review:', err);
-                alert('Failed to submit review.');
-            });
-    };
-
+    // Toggle wishlist add/remove
     const toggleWishlist = () => {
         const token = localStorage.getItem('access');
         if (!token) {
             navigate('/login');
             return;
         }
+        const url = inWishlist
+            ? 'http://localhost:8000/api/usersdata/wishlist/remove_product/'
+            : 'http://localhost:8000/api/usersdata/wishlist/add_product/';
 
-        if (inWishlist) {
-            axios.post(
-                'http://localhost:8000/api/users/wishlist/remove-product/',
-                { product_id: id },
-                { headers: { Authorization: `Bearer ${token}` } }
-            )
-                .then(() => setInWishlist(false))
-                .catch(err => console.error(err));
-        } else {
-            axios.post(
-                'http://localhost:8000/api/users/wishlist/add-product/',
-                { product_id: id },
-                { headers: { Authorization: `Bearer ${token}` } }
-            )
-                .then(() => setInWishlist(true))
-                .catch(err => console.error(err));
-        }
+        axios.post(
+            url,
+            { product_id: id },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+            .then(() => setInWishlist(!inWishlist))
+            .catch(() => alert('Failed to update wishlist.'));
     };
 
-    if (loading) return (
-        <Container className="mt-5 text-center">
-            <Spinner animation="border" role="status" />
-            <p className="mt-2">Loading product details...</p>
-        </Container>
-    );
+    // Submit a new review
+    const handleReviewSubmit = e => {
+        e.preventDefault();
+        const token = localStorage.getItem('access');
+        if (!token) return navigate('/login');
 
-    if (error) return <Alert variant="danger" className="mt-5">{error}</Alert>;
-
-    if (!product) return <Alert variant="warning" className="mt-5">Product not found.</Alert>;
-
-    const { images = [], specifications = {}, created_at } = product;
-
-    const displayImages = Array.isArray(images) && images.length > 0
-        ? images
-        : ['/default-placeholder-image.jpg'];
-
-    const productInCart = cart.find(item => item.productId === product.id);
-
-    const handleIncrease = () => {
-        updateQuantity(product.id, (productInCart?.quantity || 0) + 1);
+        axios.post(
+            `http://localhost:8000/api/products/${id}/reviews/`,
+            newReview,
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+            .then(res => {
+                setReviews(prev => [...prev, res.data]);
+                setNewReview({ rating: 5, comment: '' });
+            })
+            .catch(() => alert('Failed to submit review.'));
     };
 
-    const handleDecrease = () => {
-        if ((productInCart?.quantity || 0) - 1 <= 0) {
-            removeFromCart(product.id);
-        } else {
-            updateQuantity(product.id, (productInCart?.quantity || 0) - 1);
-        }
+    // Cart quantity helpers
+    const inCart = cart.find(item => item.productId === id);
+    const increase = () => updateQuantity(id, (inCart?.quantity || 0) + 1);
+    const decrease = () => {
+        if ((inCart?.quantity || 0) <= 1) removeFromCart(id);
+        else updateQuantity(id, inCart.quantity - 1);
     };
 
-    const handleRemove = () => {
-        removeFromCart(product.id);
-    };
+    if (loading) {
+        return (
+            <Container className="mt-5 text-center">
+                <Spinner animation="border" />
+                <p>Loading...</p>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return <Alert variant="danger" className="mt-5">{error}</Alert>;
+    }
+
+    if (!product) {
+        return <Alert variant="warning" className="mt-5">Product not found.</Alert>;
+    }
+
+    const images = product.images?.length ? product.images : ['/default-placeholder-image.jpg'];
+    const specs = product.specifications || {};
 
     return (
         <Container className="mt-5">
-            <Card className="shadow-sm text-dark" style={{ backgroundColor: siteBgColor }}>
+            <Card className="shadow-sm">
                 <Row className="g-0">
-                    <Col md={7} style={{ backgroundColor: siteBgColor }} className="p-4">
+                    {/* Image Carousel */}
+                    <Col md={7} className="p-4">
                         <Carousel
                             activeIndex={carouselIndex}
-                            onSelect={handleSelect}
+                            onSelect={setCarouselIndex}
                             indicators={false}
-                            controls={true}
+                            controls
                             interval={null}
                         >
-                            {displayImages.map((url, idx) => (
-                                <Carousel.Item key={idx} style={{ backgroundColor: siteBgColor }}>
+                            {images.map((url, idx) => (
+                                <Carousel.Item key={idx}>
                                     <Image
                                         src={url}
-                                        alt={`Slide ${idx + 1}`}
                                         fluid
                                         style={{ objectFit: 'contain', height: '500px', width: '100%' }}
                                     />
                                 </Carousel.Item>
                             ))}
                         </Carousel>
-
-                        <Row className="mt-3 gx-2">
-                            {displayImages.map((url, idx) => (
-                                <Col key={idx} xs={2} onClick={() => handleSelect(idx)}>
+                        <Row className="mt-2 gx-2">
+                            {images.map((url, idx) => (
+                                <Col xs={2} key={idx} onClick={() => setCarouselIndex(idx)}>
                                     <Image
                                         src={url}
-                                        alt={`Thumbnail ${idx + 1}`}
                                         thumbnail
-                                        style={{ cursor: 'pointer', border: carouselIndex === idx ? '2px solid #ffc107' : '1px solid #ddd' }}
+                                        style={{
+                                            cursor: 'pointer',
+                                            border: carouselIndex === idx ? '2px solid #ffc107' : undefined
+                                        }}
                                     />
                                 </Col>
                             ))}
                         </Row>
                     </Col>
 
+                    {/* Details & Actions */}
                     <Col md={5} className="p-4 d-flex flex-column">
-                        <h2 className="mb-2">{product.name}</h2>
-                        <p className="text-muted mb-3">{product.description}</p>
-                        <h4 className="text-success mb-3">₹{product.price}</h4>
-                        {created_at && (
-                            <small className="text-muted mb-4">
-                                Added on: {new Date(created_at).toLocaleDateString('en-IN')}
-                            </small>
-                        )}
+                        <h2>{product.name}</h2>
+                        <p className="text-success">₹{product.price}</p>
+                        <p>{product.description}</p>
 
-                        {Object.keys(specifications).length > 0 && (
+                        {Object.keys(specs).length > 0 && (
                             <>
-                                <h5 className="mt-3 mb-2">Specifications</h5>
-                                <ListGroup variant="flush" className="mb-4">
-                                    {Object.entries(specifications).map(([key, value]) => (
-                                        <ListGroup.Item
-                                            key={key}
-                                            className="py-2"
-                                            style={{ backgroundColor: siteBgColor, border: 'none' }}
-                                        >
-                                            <strong className="text-capitalize">{key.replace(/_/g, ' ')}:</strong> {value}
+                                <h5>Specifications</h5>
+                                <ListGroup variant="flush" className="mb-3">
+                                    {Object.entries(specs).map(([key, val]) => (
+                                        <ListGroup.Item key={key}>
+                                            <strong>{key.replace(/_/g, ' ')}:</strong> {val}
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>
                             </>
                         )}
 
-                        {/* Add to Cart + Wishlist on same line */}
-                        {!productInCart ? (
-                            <div className="d-flex align-items-center mt-auto w-100">
+                        {/* Add to Cart & Wishlist Buttons */}
+                        {!inCart ? (
+                            <div className="d-flex gap-2 mt-auto">
                                 <Button
-                                    variant="success"
-                                    size="lg"
-                                    className="flex-grow-1 me-2"
-                                    onClick={() =>
-                                        addToCart({
-                                            productId: product.id,
-                                            name: product.name,
-                                            price: product.price,
-                                            image: product.images?.[0] || null,
-                                        })
-                                    }
+                                    variant="warning"
+                                    style={{ flex: 1 }}
+                                    onClick={() => addToCart({
+                                        productId: id,
+                                        name: product.name,
+                                        price: product.price,
+                                        image: images[0]
+                                    })}
                                 >
                                     <FaShoppingCart className="me-2" /> Add to Cart
                                 </Button>
-                                <button
+                                <Button
                                     onClick={toggleWishlist}
                                     style={{
+                                        fontSize: '1.5rem',
                                         background: 'none',
                                         border: 'none',
-                                        cursor: 'pointer',
+                                        boxShadow: 'none',
+                                        outline: 'none'
                                     }}
-                                    title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
                                 >
-                                    {inWishlist ? (
-                                        <FaHeart color="red" size={32} />
-                                    ) : (
-                                        <FaRegHeart color="gray" size={32} />
-                                    )}
-                                </button>
+
+                                    {inWishlist ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                                </Button>
                             </div>
                         ) : (
-                            <div className="d-flex align-items-center mt-auto gap-3 w-100">
-                                <Button variant="outline-secondary" onClick={handleDecrease}>-</Button>
-                                <span style={{ fontSize: 18 }}>{productInCart.quantity}</span>
-                                <Button variant="outline-secondary" onClick={handleIncrease}>+</Button>
-                                <Button variant="danger" onClick={handleRemove}>Remove</Button>
+                            <div className="d-flex gap-2 mt-auto">
+                                <Button onClick={decrease}>-</Button>
+                                <span>{inCart.quantity}</span>
+                                <Button onClick={increase}>+</Button>
+                                <Button variant="danger" onClick={() => removeFromCart(id)}>Remove</Button>
+                                    <Button
+                                        onClick={toggleWishlist}
+                                        style={{
+                                            fontSize: '1.5rem',
+                                            background: 'none',
+                                            border: 'none',
+                                            boxShadow: 'none',
+                                            outline: 'none',
+                                            padding: 0
+                                        }}
+                                    >
+
+                                    {inWishlist ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                                </Button>
                             </div>
                         )}
                     </Col>
                 </Row>
 
                 {/* Reviews Section */}
-                <Row className="mt-4 p-4">
+                <Row className="p-4">
                     <Col>
                         <h4>Customer Reviews</h4>
                         {reviews.length > 0 ? (
-                            <ListGroup className="mb-3">
-                                {reviews.map((review, idx) => (
-                                    <ListGroup.Item key={idx}>
-                                        <strong>{review.user}</strong>
-                                        <div>
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <span
-                                                    key={star}
-                                                    style={{
-                                                        color: star <= review.rating ? 'green' : '#ccc',
-                                                        fontSize: '1.2rem',
-                                                    }}
-                                                >
-                                                    ★
-                                                </span>
-                                            ))}
-                                        </div>
-                                        <p>{review.comment}</p>
-                                        <small className="text-muted">
-                                            {new Date(review.created_at).toLocaleString()}
-                                        </small>
-                                    </ListGroup.Item>
-                                ))}
-                            </ListGroup>
+                            reviews.map((rev, idx) => (
+                                <Card key={idx} className="mb-3 p-3">
+                                    <strong>{rev.user}</strong>
+                                    <div>
+                                        {[1, 2, 3, 4, 5].map(st => (
+                                            <span
+                                                key={st}
+                                                style={{ color: st <= rev.rating ? 'green' : '#ccc' }}
+                                            >
+                                                &#9733;
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <p>{rev.comment}</p>
+                                    <small className="text-muted">
+                                        {new Date(rev.created_at).toLocaleString()}
+                                    </small>
+                                </Card>
+                            ))
                         ) : (
                             <p>No reviews yet. Be the first to review!</p>
                         )}
 
-                        {/* Submit Review Form */}
                         <h5 className="mt-4">Leave a Review</h5>
                         <Form onSubmit={handleReviewSubmit}>
-                            <Form.Group controlId="reviewRating" className="mb-2">
+                            <Form.Group className="mb-2">
                                 <Form.Label>Rating</Form.Label>
-                                <div className="mb-2">
-                                    {[1, 2, 3, 4, 5].map((star) => (
+                                <div>
+                                    {[1, 2, 3, 4, 5].map(n => (
                                         <Button
-                                            key={star}
+                                            key={n}
                                             type="button"
-                                            variant="link"
-                                            onClick={() => setNewReview({ ...newReview, rating: star })}
                                             style={{
-                                                color: star <= newReview.rating ? 'green' : '#ccc',
-                                                fontSize: '1.8rem',
-                                                textDecoration: 'none',
+                                                color: n <= newReview.rating ? 'green' : '#ccc',
+                                                fontSize: '2rem',           // increase star size
+                                                marginRight: '10px',        // add space between stars
+                                                background: 'none',
+                                                border: 'none',
+                                                padding: 0,
+                                                textDecoration: 'none'
                                             }}
+                                            onClick={() => setNewReview({ ...newReview, rating: n })}
                                         >
-                                            ★
+                                            &#9733;
                                         </Button>
+
+
                                     ))}
                                 </div>
                             </Form.Group>
-                            <Form.Group controlId="reviewComment" className="mb-2">
+                            <Form.Group className="mb-2">
                                 <Form.Label>Comment</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
                                     value={newReview.comment}
-                                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                                    onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
                                     required
                                 />
                             </Form.Group>
@@ -350,5 +309,3 @@ function ProductDetails() {
         </Container>
     );
 }
-
-export default ProductDetails;
