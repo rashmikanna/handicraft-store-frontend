@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
+import VoiceInput from '../../components/VoiceInput';
 import './SellerSignup.css';
 
 export default function SellerSignup() {
@@ -56,9 +57,8 @@ export default function SellerSignup() {
                     },
                 }
             );
-            // after successful POST…
-              setMsg('Application submitted, pending approval.');
-              setTimeout(() => navigate('/seller-panel/status'), 1000);
+            setMsg('Application submitted, pending approval.');
+            setTimeout(() => navigate('/seller-panel/status'), 1000);
         } catch (error) {
             setErr(true);
             const detail = error.response?.data?.detail || 'Submission failed.';
@@ -85,14 +85,21 @@ export default function SellerSignup() {
                     ].map(field => (
                         <Form.Group controlId={field.name} className="mb-3" key={field.name}>
                             <Form.Label>{field.label}</Form.Label>
-                            <Form.Control
-                                required
-                                type="text"
-                                name={field.name}
-                                value={formData[field.name]}
-                                onChange={handleChange}
-                                className="long-input"
-                            />
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    name={field.name}
+                                    value={formData[field.name]}
+                                    onChange={handleChange}
+                                    className="long-input"
+                                />
+                                <VoiceInput
+                                    setValue={(text) =>
+                                        setFormData(prev => ({ ...prev, [field.name]: text }))
+                                    }
+                                />
+                            </div>
                         </Form.Group>
                     ))}
 
