@@ -1,333 +1,352 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Card, Form, Button, Row, Col, Spinner, Alert } from 'react-bootstrap';
+import {
+    Container,
+    Card,
+    Form,
+    Button,
+    Row,
+    Col,
+    Spinner,
+    Alert
+} from 'react-bootstrap';
+import axios from 'axios';
 import VoiceInput from '../../components/VoiceInput';
 
 const API_BASE = 'http://127.0.0.1:8000/api';
 
 const presetSpecs = {
-  'Karimnagar Silver Filigrees': ['material', 'technique', 'design', 'dimensions', 'weight', 'care', 'origin'],
-  'Dokra Metal Crafts': ['material', 'technique', 'design', 'dimensions', 'weight', 'finish', 'care', 'origin'],
+    'Karimnagar Silver Filigrees': [
+        'material',
+        'technique',
+        'design',
+        'dimensions',
+        'weight',
+        'care',
+        'origin'
+    ],
+    'Dokra Metal Crafts': [
+        'material',
+        'technique',
+        'design',
+        'dimensions',
+        'weight',
+        'finish',
+        'care',
+        'origin'
+    ]
 };
 
 export default function SellerProductForm() {
-  const { id } = useParams();
-  const isEdit = Boolean(id);
-  const navigate = useNavigate();
+    const { id } = useParams();
+    const isEdit = Boolean(id);
+    const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
-  const [crafts, setCrafts] = useState([]);
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock: '',
-    category: '',
-    craft: '',
-    available: true,
-    images: [],
-    specifications: [],
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const [categories, setCategories] = useState([]);
+    const [crafts, setCrafts] = useState([]);
+    const [form, setForm] = useState({
+        name: '',
+        description: '',
+        price: '',
+        stock: '',
+        category: '',
+        craft: '',
+        available: true,
+        images: [],
+        frames: [],
+        specifications: []
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch(`${API_BASE}/products/categories/`)
-      .then(res => res.json())
-      .then(setCategories)
-      .catch(() => setError('Failed to load categories'));
+    useEffect(() => {
+        axios.get(`${API_BASE}/products/categories/`)
+            .then(r => setCategories(r.data))
+            .catch(() => setError('Failed to load categories'));
+        axios.get(`${API_BASE}/products/products/tags/`)
+            .then(r => setCrafts(r.data))
+            .catch(() => setError('Failed to load craft tags'));
 
-    fetch(`${API_BASE}/products/products/tags/`)
-      .then(res => res.json())
-      .then(setCrafts)
-      .catch(() => setError('Failed to load craft tags'));
+        if (isEdit) {
+            setLoading(true);
+            axios.get(`${API_BASE}/products/products/${id}/`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
+            })
+                .then(r => {
+                    const d = r.data;
+                    setForm({
+                        name: d.name || '',
+                        description: d.description || '',
+                        price: d.price?.toString() || '',
+                        stock: d.stock?.toString() || '',
+                        category: d.category || '',
+                        craft: d.tags?.[0] || '',
+                        available: d.available,
+                        images: d.images || [],
+                        frames: [],
+                        specifications: Object.entries(d.specifications || {}).map(
+                            ([k, v]) => ({ key: k, value: v })
+                        )
+                    });
+                })
+                .catch(() => setError('Failed to load product'))
+                .finally(() => setLoading(false));
+        }
+    }, [id, isEdit]);
 
-    if (isEdit) {
-      setLoading(true);
-      fetch(`${API_BASE}/products/products/${id}/`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` }
-      })
-        .then(res => res.json())
-        .then(data => {
-          const specsArray = Object.entries(data.specifications).map(([key, value]) => ({ key, value }));
-          setForm({
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            stock: data.stock,
-            category: data.category,
-            craft: data.tags[0] || '',
-            available: data.available,
-            images: data.images,
-            specifications: specsArray,
-          });
-        })
-        .catch(() => setError('Failed to load product'))
-        .finally(() => setLoading(false));
-    }
-  }, [id, isEdit]);
+    useEffect(() => {
+        if (!isEdit && form.craft && presetSpecs[form.craft]) {
+            setForm(f => ({
+                ...f,
+                specifications: presetSpecs[f.craft].map(key => ({ key, value: '' }))
+            }));
+        }
+    }, [form.craft, isEdit]);
 
-  useEffect(() => {
-    if (!isEdit && form.craft && presetSpecs[form.craft]) {
-      setForm(f => ({
-        ...f,
-        specifications: presetSpecs[form.craft].map(key => ({ key, value: '' }))
-      }));
-    }
-  }, [form.craft, isEdit]);
-
-  const handleChange = e => {
-    const { name, value, type, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const handleImageUpload = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const fd = new FormData();
-    fd.append('image', file);
-    fetch(`${API_BASE}/products/upload-image/`, { method: 'POST', body: fd })
-      .then(res => res.json())
-      .then(data => setForm(prev => ({ ...prev, images: [...prev.images, data.image_url] })))
-      .catch(() => setError('Image upload failed'));
-  };
-
-  const handleSpecChange = (idx, field, value) => {
-    const newSpecs = [...form.specifications];
-    newSpecs[idx][field] = value;
-    setForm(prev => ({ ...prev, specifications: newSpecs }));
-  };
-
-  const addSpecRow = () => {
-    setForm(f => ({ ...f, specifications: [...f.specifications, { key: '', value: '' }] }));
-  };
-
-  const removeSpecRow = idx => {
-    setForm(f => ({ ...f, specifications: f.specifications.filter((_, i) => i !== idx) }));
-  };
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    const specsObj = form.specifications.reduce((obj, { key, value }) => {
-      if (key && value) obj[key] = value;
-      return obj;
-    }, {});
-
-    const payload = {
-      name: form.name,
-      description: form.description,
-      price: parseFloat(form.price),
-      stock: parseInt(form.stock, 10),
-      category: form.category,
-      tags: [form.craft],
-      images: form.images,
-      available: form.available,
-      specifications: specsObj,
+    const handleChange = e => {
+        const { name, value, type, checked } = e.target;
+        setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
-    const endpoint = isEdit
-      ? `${API_BASE}/products/products/${id}/`
-      : `${API_BASE}/products/products/`;
+    const handleImageUpload = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append('image', file);
+        axios.post(`${API_BASE}/products/upload-image/`, fd)
+            .then(r => setForm(p => ({ ...p, images: [...p.images, r.data.image_url] })))
+            .catch(() => setError('Image upload failed'));
+    };
 
-    fetch(endpoint, {
-      method: isEdit ? 'PUT' : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('access')}`
-      },
-      body: JSON.stringify(payload)
-    })
-      .then(res => { if (!res.ok) throw new Error(`Server responded ${res.status}`); return res.json(); })
-      .then(() => navigate('/seller'))
-      .catch(err => setError(`Save failed: ${err.message}`))
-      .finally(() => setLoading(false));
-  };
+    const handleFramesChange = e => {
+        const files = Array.from(e.target.files);
+        setForm(prev => ({ ...prev, frames: files }));
+    };
 
-  return (
-    <Container className="mt-5">
-      <Card className="mx-auto p-4" style={{ maxWidth: '600px' }}>
-        <h2 className="mb-4 text-center">{isEdit ? 'Edit Product' : 'Add Product'}</h2>
-        {error && <Alert variant="danger">{error}</Alert>}
-        <Form onSubmit={handleSubmit}>
+    const handleSpecChange = (i, field, v) => {
+        const specs = [...form.specifications];
+        specs[i][field] = v;
+        setForm(p => ({ ...p, specifications: specs }));
+    };
+    const addSpec = () =>
+        setForm(p => ({ ...p, specifications: [...p.specifications, { key: '', value: '' }] }));
+    const removeSpec = i =>
+        setForm(p => ({ ...p, specifications: p.specifications.filter((_, j) => j !== i) }));
 
-          {/* ✅ Name */}
-          <Form.Group as={Row} className="mb-3" controlId="name">
-            <Form.Label column sm={3}>Name</Form.Label>
-            <Col sm={9} className="d-flex align-items-center">
-              <Form.Control
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-              <VoiceInput
-                setValue={(text) => {
-                    const capitalized = text
-                    .toLowerCase()
-                    .replace(/\b\w/g, char => char.toUpperCase()) // Capitalize first letter of each word
-                    .replace(/\.$/, ''); // Remove trailing period if present
-                    setForm(prev => ({ ...prev, name: capitalized }));
-                }}
-                />
-            </Col>
-          </Form.Group>
+    const handleSubmit = async e => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
 
-          {/* ✅ Description */}
-          <Form.Group as={Row} className="mb-3" controlId="description">
-            <Form.Label column sm={3}>Description</Form.Label>
-            <Col sm={9} className="d-flex align-items-center">
-              <Form.Control
-                as="textarea"
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                rows={3}
-              />
-              <VoiceInput setValue={(text) => setForm(prev => ({ ...prev, description: text }))} />
-            </Col>
-          </Form.Group>
+        const specsObj = {};
+        form.specifications.forEach(s => { if (s.key && s.value) specsObj[s.key] = s.value; });
 
-          {/* ✅ Price */}
-          <Form.Group as={Row} className="mb-3" controlId="price">
-            <Form.Label column sm={3}>Price</Form.Label>
-            <Col sm={9} className="d-flex align-items-center">
-              <Form.Control
-                type="number"
-                /*step="0.01"*/
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                required
-              />
-              <VoiceInput setValue={(text) => {
-                const numeric = parseFloat(text.replace(/[^\d.]/g, '')).toFixed(2);
-                setForm(prev => ({ ...prev, price: numeric }));
-                }} />
-            </Col>
-          </Form.Group>
+        const payload = {
+            name: form.name,
+            description: form.description,
+            price: parseFloat(form.price),
+            stock: parseInt(form.stock, 10),
+            category: form.category,
+            tags: [form.craft],
+            available: form.available,
+            images: form.images,
+            specifications: specsObj
+        };
 
-          {/* ✅ Stock */}
-          <Form.Group as={Row} className="mb-3" controlId="stock">
-            <Form.Label column sm={3}>Stock</Form.Label>
-            <Col sm={9} className="d-flex align-items-center">
-              <Form.Control
-                type="number"
-                name="stock"
-                value={form.stock}
-                onChange={handleChange}
-                required
-              />
-              <VoiceInput setValue={(text) => setForm(prev => ({ ...prev, stock: text.replace(/[^0-9]/g, '') }))} />
-            </Col>
-          </Form.Group>
+        try {
+            const url = isEdit
+                ? `${API_BASE}/products/products/${id}/`
+                : `${API_BASE}/products/products/`;
+            const method = isEdit ? 'put' : 'post';
+            const res = await axios({
+                method, url, data: payload, headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('access')}`
+                }
+            });
 
-          {/* Category */}
-          <Form.Group as={Row} className="mb-3" controlId="category">
-            <Form.Label column sm={3}>Category</Form.Label>
-            <Col sm={9}>
-              <Form.Select name="category" value={form.category} onChange={handleChange} required>
-                <option value="">Select…</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </Form.Select>
-            </Col>
-          </Form.Group>
+            const prodId = isEdit ? id : res.data.id;
+            if (form.frames.length) {
+                const fd = new FormData();
+                form.frames.forEach(f => fd.append('frames', f));
+                await axios.post(
+                    `${API_BASE}/products/products/${prodId}/upload-spin-frames/`,
+                    fd,
+                    { headers: { Authorization: `Bearer ${localStorage.getItem('access')}` } }
+                );
+            }
 
-          {/* Craft */}
-          <Form.Group as={Row} className="mb-3" controlId="craft">
-            <Form.Label column sm={3}>Craft Type</Form.Label>
-            <Col sm={9}>
-              <Form.Select name="craft" value={form.craft} onChange={handleChange} required>
-                <option value="">Select Craft…</option>
-                {crafts.map(c => <option key={c} value={c}>{c}</option>)}
-              </Form.Select>
-            </Col>
-          </Form.Group>
+            navigate('/seller');
+        } catch (err) {
+            setError('Save failed: ' + JSON.stringify(err.response?.data || err.message));
+        } finally {
+            setLoading(false);
+        }
+    };
 
-          {/* Specifications */}
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>Specifications</Form.Label>
-            <Col sm={9}>
-              {form.specifications.map((spec, idx) => (
-                <Row key={idx} className="mb-2">
-                    {/* Field name with VoiceInput */}
-                    <Col sm={5} className="d-flex align-items-center">
-                    <Form.Control
-                        placeholder="Field name"
-                        value={spec.key}
-                        onChange={e => handleSpecChange(idx, 'key', e.target.value)}
-                        required
-                    />
-                    <VoiceInput
-                        setValue={(text) => {
-                        const cleaned = text.trim().replace(/\.$/, '');
-                        handleSpecChange(idx, 'key', cleaned);
-                        }}
-                    />
-                    </Col>
+    return (
+        <Container className="mt-5">
+            <Card className="mx-auto p-4" style={{ maxWidth: 600 }}>
+                <h2 className="mb-4 text-center">{isEdit ? 'Edit' : 'Add'} Product</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group controlId="name" className="mb-3">
+                        <Form.Label>Name</Form.Label>
+                        <div className="d-flex align-items-center">
+                            <Form.Control
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                required
+                            />
+                            <VoiceInput setValue={text => setForm(p => ({ ...p, name: text.trim() }))} />
+                        </div>
+                    </Form.Group>
 
-                    {/* Field value with VoiceInput */}
-                    <Col sm={5} className="d-flex align-items-center">
-                    <Form.Control
-                        placeholder="Value"
-                        value={spec.value}
-                        onChange={e => handleSpecChange(idx, 'value', e.target.value)}
-                        required
-                    />
-                    <VoiceInput
-                        setValue={(text) => {
-                        const cleaned = text.trim().replace(/\.$/, '');
-                        handleSpecChange(idx, 'value', cleaned);
-                        }}
-                    />
-                    </Col>
+                    <Form.Group controlId="description" className="mb-3">
+                        <Form.Label>Description</Form.Label>
+                        <div className="d-flex align-items-center">
+                            <Form.Control
+                                as="textarea"
+                                name="description"
+                                value={form.description}
+                                onChange={handleChange}
+                                rows={3}
+                            />
+                            <VoiceInput setValue={text => setForm(p => ({ ...p, description: text.trim() }))} />
+                        </div>
+                    </Form.Group>
 
-                    {/* Delete button */}
-                    <Col sm={2}>
-                    <Button variant="danger" size="sm" onClick={() => removeSpecRow(idx)}>✕</Button>
-                    </Col>
-                </Row>
-                ))}
+                    <Row className="mb-3">
+                        <Form.Group as={Col} controlId="price">
+                            <Form.Label>Price</Form.Label>
+                            <Form.Control
+                                name="price"
+                                type="number"
+                                step="0.01"
+                                value={form.price}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group as={Col} controlId="stock">
+                            <Form.Label>Stock</Form.Label>
+                            <Form.Control
+                                name="stock"
+                                type="number"
+                                value={form.stock}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+                    </Row>
 
+                    <Form.Group controlId="category" className="mb-3">
+                        <Form.Label>Category</Form.Label>
+                        <Form.Select
+                            name="category"
+                            value={form.category}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select…</option>
+                            {categories.map(c => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
 
-              <Button variant="secondary" size="sm" onClick={addSpecRow}>
-                + Add specification
-              </Button>
-            </Col>
-          </Form.Group>
+                    <Form.Group controlId="craft" className="mb-3">
+                        <Form.Label>Craft Type</Form.Label>
+                        <Form.Select
+                            name="craft"
+                            value={form.craft}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select…</option>
+                            {crafts.map(t => (
+                                <option key={t} value={t}>{t}</option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
 
-          {/* Images */}
-          <Form.Group as={Row} className="mb-3" controlId="images">
-            <Form.Label column sm={3}>Images</Form.Label>
-            <Col sm={9}>
-              <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
-              <div className="mt-2 d-flex flex-wrap gap-2">
-                {form.images.map((url, idx) => (
-                  <img key={idx} src={url} alt="Product" style={{ height: '80px', width: '80px', objectFit: 'cover', borderRadius: '4px' }} />
-                ))}
-              </div>
-            </Col>
-          </Form.Group>
+                    <Form.Group controlId="specs" className="mb-3">
+                        <Form.Label>Specifications</Form.Label>
+                        {form.specifications.map((s, i) => (
+                            <Row key={i} className="mb-2">
+                                <Col>
+                                    <Form.Control
+                                        placeholder="Key"
+                                        value={s.key}
+                                        onChange={e => handleSpecChange(i, 'key', e.target.value)}
+                                        required
+                                    />
+                                </Col>
+                                <Col>
+                                    <Form.Control
+                                        placeholder="Value"
+                                        value={s.value}
+                                        onChange={e => handleSpecChange(i, 'value', e.target.value)}
+                                        required
+                                    />
+                                </Col>
+                                <Col xs="auto">
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={() => removeSpec(i)}
+                                    >✕</Button>
+                                </Col>
+                            </Row>
+                        ))}
+                        <Button variant="secondary" size="sm" onClick={addSpec}>
+                            + Add Spec
+                        </Button>
+                    </Form.Group>
 
-          {/* Available */}
-          <Form.Group as={Row} className="mb-4" controlId="available">
-            <Col sm={{ span: 9, offset: 3 }}>
-              <Form.Check name="available" type="checkbox" label="Available" checked={form.available} onChange={handleChange} />
-            </Col>
-          </Form.Group>
+                    <Form.Group controlId="images" className="mb-3">
+                        <Form.Label>Images</Form.Label>
+                        <Form.Control
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                        />
+                        <div className="mt-2 d-flex flex-wrap gap-2">
+                            {form.images.map((url, i) => (
+                                <img
+                                    key={i} src={url} alt="Product" style={{ height: 80, width: 80, objectFit: 'cover', borderRadius: 4 }}
+                                />
+                            ))}
+                        </div>
+                    </Form.Group>
 
-          {/* Submit Button */}
-          <div className="text-center">
-            <Button type="submit" disabled={loading} className="px-5">
-              {loading ? <Spinner animation="border" size="sm" /> : isEdit ? 'Update' : 'Create'}
-            </Button>
-          </div>
-        </Form>
-      </Card>
-    </Container>
-  );
+                    <Form.Group controlId="frames" className="mb-3">
+                        <Form.Label>360° View Frames</Form.Label>
+                        <Form.Control
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleFramesChange}
+                        />
+                    </Form.Group>
+
+                    <Form.Group controlId="available" className="mb-3">
+                        <Form.Check
+                            name="available"
+                            label="Available"
+                            checked={form.available}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+
+                    <div className="text-center">
+                        <Button type="submit" disabled={loading} className="px-5">
+                            {loading ? <Spinner animation="border" size="sm" /> : isEdit ? 'Update' : 'Create'}
+                        </Button>
+                    </div>
+                </Form>
+            </Card>
+        </Container>
+    );
 }
