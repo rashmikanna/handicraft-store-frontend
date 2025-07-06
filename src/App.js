@@ -5,6 +5,8 @@ import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import ProductListing from './pages/ProductListing';
 import ProductDetails from './pages/ProductDetails';
+import CraftsPage from './components/CraftsPage';
+import CraftDetail from './components/CraftDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Contact from './pages/Contact';
@@ -46,8 +48,8 @@ function App() {
                     {/* Products */}
                     <Route path="/products" element={<ProductListing />} />
                     <Route path="/products/:id" element={<ProductDetails />} />
-
-                    {/* Cart & Checkout */}
+                    <Route path="/crafts/:slug" element={<CraftDetail />} />                    {/* Cart & Checkout */}
+                    <Route path="/crafts/:slug" element={<CraftDetail />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/orders/history" element={<OrderHistory />} />

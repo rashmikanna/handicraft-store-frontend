@@ -23,6 +23,7 @@
   "dependencies": {
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
+    "framer-motion": "^12.23.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.9",
     "react-bootstrap-icons": "^1.11.6",
@@ -31,8 +32,11 @@
     "react-google-recaptcha": "^3.1.0",
     "react-icons": "^5.5.0",
     "react-lottie-player": "^2.1.0",
+    "react-markdown": "^10.1.0",
+    "react-masonry-css": "^1.0.16",
     "react-router-dom": "^6.30.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "remark-gfm": "^4.0.1"
   },
   "browserslist": {
     "production": [
@@ -45,5 +49,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "proxy": "http://localhost:8000",
+  "overrides": {
+    "react-360-view": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0"
+    }
   }
 }
