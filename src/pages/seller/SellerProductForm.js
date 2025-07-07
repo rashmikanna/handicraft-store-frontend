@@ -11,6 +11,7 @@ import {
     Alert
 } from 'react-bootstrap';
 import axios from 'axios';
+
 import VoiceInput from '../../components/VoiceInput';
 
 const API_BASE = 'http://127.0.0.1:8000/api';
@@ -23,7 +24,7 @@ const presetSpecs = {
         'dimensions',
         'weight',
         'care',
-        'origin'
+        'origin',
     ],
     'Dokra Metal Crafts': [
         'material',
@@ -33,8 +34,8 @@ const presetSpecs = {
         'weight',
         'finish',
         'care',
-        'origin'
-    ]
+        'origin',
+    ],
 };
 
 export default function SellerProductForm() {
@@ -53,19 +54,21 @@ export default function SellerProductForm() {
         craft: '',
         available: true,
         images: [],
-        frames: [],
+        frames: [],          // for 360° frames
         specifications: []
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // load dropdowns & existing product
     useEffect(() => {
         axios.get(`${API_BASE}/products/categories/`)
             .then(r => setCategories(r.data))
-            .catch(() => setError('Failed to load categories'));
+            .catch(() => { /* ignore */ });
+
         axios.get(`${API_BASE}/products/products/tags/`)
             .then(r => setCrafts(r.data))
-            .catch(() => setError('Failed to load craft tags'));
+            .catch(() => { /* ignore */ });
 
         if (isEdit) {
             setLoading(true);
@@ -83,7 +86,7 @@ export default function SellerProductForm() {
                         craft: d.tags?.[0] || '',
                         available: d.available,
                         images: d.images || [],
-                        frames: [],
+                        frames: [],  // we only send new frames
                         specifications: Object.entries(d.specifications || {}).map(
                             ([k, v]) => ({ key: k, value: v })
                         )
@@ -94,6 +97,7 @@ export default function SellerProductForm() {
         }
     }, [id, isEdit]);
 
+    // auto‑fill specs for new products
     useEffect(() => {
         if (!isEdit && form.craft && presetSpecs[form.craft]) {
             setForm(f => ({
@@ -105,42 +109,61 @@ export default function SellerProductForm() {
 
     const handleChange = e => {
         const { name, value, type, checked } = e.target;
-        setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        setForm(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
+    // single image upload
     const handleImageUpload = e => {
         const file = e.target.files[0];
         if (!file) return;
         const fd = new FormData();
         fd.append('image', file);
         axios.post(`${API_BASE}/products/upload-image/`, fd)
-            .then(r => setForm(p => ({ ...p, images: [...p.images, r.data.image_url] })))
+            .then(r => setForm(p => ({
+                ...p,
+                images: [...p.images, r.data.image_url]
+            })))
             .catch(() => setError('Image upload failed'));
     };
 
+    // 360° frames selection only (not yet uploaded)
     const handleFramesChange = e => {
         const files = Array.from(e.target.files);
         setForm(prev => ({ ...prev, frames: files }));
     };
 
+    // specs add/remove
     const handleSpecChange = (i, field, v) => {
         const specs = [...form.specifications];
         specs[i][field] = v;
         setForm(p => ({ ...p, specifications: specs }));
     };
     const addSpec = () =>
-        setForm(p => ({ ...p, specifications: [...p.specifications, { key: '', value: '' }] }));
+        setForm(p => ({
+            ...p,
+            specifications: [...p.specifications, { key: '', value: '' }]
+        }));
     const removeSpec = i =>
-        setForm(p => ({ ...p, specifications: p.specifications.filter((_, j) => j !== i) }));
+        setForm(p => ({
+            ...p,
+            specifications: p.specifications.filter((_, j) => j !== i)
+        }));
 
     const handleSubmit = async e => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
+        // build specs object
         const specsObj = {};
-        form.specifications.forEach(s => { if (s.key && s.value) specsObj[s.key] = s.value; });
+        form.specifications.forEach(s => {
+            if (s.key && s.value) specsObj[s.key] = s.value;
+        });
 
+        // core payload
         const payload = {
             name: form.name,
             description: form.description,
@@ -150,23 +173,28 @@ export default function SellerProductForm() {
             tags: [form.craft],
             available: form.available,
             images: form.images,
-            specifications: specsObj
+            specifications: specsObj,
         };
 
         try {
+            // create or update
             const url = isEdit
                 ? `${API_BASE}/products/products/${id}/`
                 : `${API_BASE}/products/products/`;
             const method = isEdit ? 'put' : 'post';
             const res = await axios({
-                method, url, data: payload, headers: {
+                method,
+                url,
+                data: payload,
+                headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('access')}`
                 }
             });
 
             const prodId = isEdit ? id : res.data.id;
-            if (form.frames.length) {
+            // upload frames if any
+            if (form.frames.length > 0) {
                 const fd = new FormData();
                 form.frames.forEach(f => fd.append('frames', f));
                 await axios.post(
@@ -178,7 +206,8 @@ export default function SellerProductForm() {
 
             navigate('/seller');
         } catch (err) {
-            setError('Save failed: ' + JSON.stringify(err.response?.data || err.message));
+            const msg = err.response?.data || err.message;
+            setError('Save failed: ' + JSON.stringify(msg));
         } finally {
             setLoading(false);
         }
@@ -190,6 +219,7 @@ export default function SellerProductForm() {
                 <h2 className="mb-4 text-center">{isEdit ? 'Edit' : 'Add'} Product</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <Form onSubmit={handleSubmit}>
+                    {/* name */}
                     <Form.Group controlId="name" className="mb-3">
                         <Form.Label>Name</Form.Label>
                         <div className="d-flex align-items-center">
@@ -203,6 +233,7 @@ export default function SellerProductForm() {
                         </div>
                     </Form.Group>
 
+                    {/* description */}
                     <Form.Group controlId="description" className="mb-3">
                         <Form.Label>Description</Form.Label>
                         <div className="d-flex align-items-center">
@@ -217,6 +248,7 @@ export default function SellerProductForm() {
                         </div>
                     </Form.Group>
 
+                    {/* price & stock */}
                     <Row className="mb-3">
                         <Form.Group as={Col} controlId="price">
                             <Form.Label>Price</Form.Label>
@@ -241,6 +273,7 @@ export default function SellerProductForm() {
                         </Form.Group>
                     </Row>
 
+                    {/* category */}
                     <Form.Group controlId="category" className="mb-3">
                         <Form.Label>Category</Form.Label>
                         <Form.Select
@@ -256,6 +289,7 @@ export default function SellerProductForm() {
                         </Form.Select>
                     </Form.Group>
 
+                    {/* craft tag */}
                     <Form.Group controlId="craft" className="mb-3">
                         <Form.Label>Craft Type</Form.Label>
                         <Form.Select
@@ -271,6 +305,7 @@ export default function SellerProductForm() {
                         </Form.Select>
                     </Form.Group>
 
+                    {/* specifications */}
                     <Form.Group controlId="specs" className="mb-3">
                         <Form.Label>Specifications</Form.Label>
                         {form.specifications.map((s, i) => (
@@ -305,6 +340,7 @@ export default function SellerProductForm() {
                         </Button>
                     </Form.Group>
 
+                    {/* images */}
                     <Form.Group controlId="images" className="mb-3">
                         <Form.Label>Images</Form.Label>
                         <Form.Control
@@ -315,12 +351,21 @@ export default function SellerProductForm() {
                         <div className="mt-2 d-flex flex-wrap gap-2">
                             {form.images.map((url, i) => (
                                 <img
-                                    key={i} src={url} alt="Product" style={{ height: 80, width: 80, objectFit: 'cover', borderRadius: 4 }}
+                                    key={i}
+                                    src={url}
+                                    alt="Product"
+                                    style={{
+                                        height: 80,
+                                        width: 80,
+                                        objectFit: 'cover',
+                                        borderRadius: 4
+                                    }}
                                 />
                             ))}
                         </div>
                     </Form.Group>
 
+                    {/* 360° view frames */}
                     <Form.Group controlId="frames" className="mb-3">
                         <Form.Label>360° View Frames</Form.Label>
                         <Form.Control
@@ -331,6 +376,7 @@ export default function SellerProductForm() {
                         />
                     </Form.Group>
 
+                    {/* available */}
                     <Form.Group controlId="available" className="mb-3">
                         <Form.Check
                             name="available"
@@ -341,8 +387,14 @@ export default function SellerProductForm() {
                     </Form.Group>
 
                     <div className="text-center">
-                        <Button type="submit" disabled={loading} className="px-5">
-                            {loading ? <Spinner animation="border" size="sm" /> : isEdit ? 'Update' : 'Create'}
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="px-5"
+                        >
+                            {loading
+                                ? <Spinner animation="border" size="sm" />
+                                : isEdit ? 'Update' : 'Create'}
                         </Button>
                     </div>
                 </Form>
